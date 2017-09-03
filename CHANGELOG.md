@@ -3,4 +3,4 @@
 ## 0.0.1
 
 - `CsvParser` to parse CSV-like files
-- ``
+- `LabeledTsv` to read/write labeled TSV files
