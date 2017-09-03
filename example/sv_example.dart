@@ -5,6 +5,7 @@ import 'package:grizzly_io/grizzly_io.dart';
 import 'package:grizzly_io/src/csv/parser/parser.dart';
 
 main() {
+  /*
   String fs = r',';
   String ts = r"'";
 
@@ -17,4 +18,5 @@ main() {
   } else {
     cols.forEach(print);
   }
+  */
 }

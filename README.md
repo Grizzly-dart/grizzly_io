@@ -1,4 +1,4 @@
-# sv
+# Grizzly IO
 
 Readers and writers for several file formats (CSV, TSV, JSON, YAML, etc)
 

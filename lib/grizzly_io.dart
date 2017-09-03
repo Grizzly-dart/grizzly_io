@@ -6,3 +6,4 @@ library grizzly.io;
 
 export 'src/base.dart';
 export 'src/tsv/tsv.dart';
+export 'src/type_converter/type_converter.dart';
