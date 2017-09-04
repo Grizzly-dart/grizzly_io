@@ -58,6 +58,8 @@ class LabeledTsv implements LabeledAccess {
     */
   }
 
+  Iterable<T> map<T>(T mapper(Map row)) => data.map<T>(mapper);
+
   /// TSV parser
   static const CsvParser parser = const CsvParser(fieldSep: '\t');
 
