@@ -12,14 +12,14 @@ import 'dart:convert';
 import 'package:http/browser_client.dart';
 import 'package:grizzly_io/grizzly_io.dart';
 
-Future<LabeledTsv> requestLabTsv(String url) async {
+Future<LabeledTable> requestLabTsv(String url) async {
 	final client = new BrowserClient();
 	final Response resp = await client.get(url);
-	return new LabeledTsv.parse(resp.body);
+	return parseLabTsv(resp.body);
 }
 
 /// Reads file/blob as labeled TSV file
-Future<LabeledTsv> readLabTsv(Blob file, {Encoding encoding: UTF8}) async {
+Future<LabeledTable> readLabTsv(Blob file, {Encoding encoding: UTF8}) async {
 	FileReader reader = new FileReader();
 	reader.readAsText(file);
 	await reader.onLoadEnd.first;
@@ -29,5 +29,5 @@ Future<LabeledTsv> readLabTsv(Blob file, {Encoding encoding: UTF8}) async {
 	if(reader.result is! String) {
 		throw new Exception('Could not read File/Blob!');
 	}
-	return new LabeledTsv.parse(reader.result);
+	return parseLabTsv(reader.result);
 }

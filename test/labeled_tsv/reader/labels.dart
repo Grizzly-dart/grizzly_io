@@ -12,7 +12,7 @@ void main() {
 
     test('Normal', () {
       final file = new File('data/labeled_tsv/normal.tsv');
-      final tsv = new LabeledTsv.parse(file.readAsStringSync());
+      final tsv = parseLabTsv(file.readAsStringSync());
       expect(tsv.labels, ['Name', 'Age', 'House']);
       expect(tsv.data, hasLength(4));
       expect(tsv.data[0], {'Name': 'Jon', 'Age': '25', 'House': "Stark"});
@@ -25,7 +25,7 @@ void main() {
 
     test('Quoted', () {
       final file = new File('data/labeled_tsv/headers/quoted.tsv');
-      final tsv = new LabeledTsv.parse(file.readAsStringSync());
+      final tsv = parseLabTsv(file.readAsStringSync());
       expect(tsv.labels, ['Name', 'Age', 'House']);
       expect(tsv.data, hasLength(4));
       expect(tsv.data[0], {'Name': 'Jon', 'Age': '25', 'House': "Stark"});
@@ -38,7 +38,7 @@ void main() {
 
     test('Tab in label', () {
       final file = new File('data/labeled_tsv/headers/tab_in_label.tsv');
-      final tsv = new LabeledTsv.parse(file.readAsStringSync());
+      final tsv = parseLabTsv(file.readAsStringSync());
       expect(tsv.labels, ['Name', 'Age', 'House\t(h)']);
       expect(tsv.data, hasLength(4));
       expect(tsv.data[0], {'Name': 'Jon', 'Age': '25', 'House\t(h)': "Stark"});

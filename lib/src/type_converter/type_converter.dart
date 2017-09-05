@@ -1,7 +1,9 @@
 /// Utility functions to convert dynamic columns in tables to typed columns
 library grizzly.io.transform;
 
+import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'dart:collection';
 
 /// Utility functions to convert dynamic columns in tables to typed columns
 class TypeConverter {
@@ -57,22 +59,30 @@ class TypeConverter {
     throw new Exception('Trying to convert a non-num to num!');
   }
 
-  static bool isBool(v) {
+  static bool isBool(v,
+      {List<String> trues: const ['true', 'True'],
+      List<String> falses: const ['false', 'False']}) {
     if (v == null) return true;
     if (v is bool) return true;
     if (v is num) return true;
-    if (v is String)
-      return ['true', 'True', 'TRUE', 'false', 'False', 'FALSE'].contains(v);
+    if (v is String) {
+      if (trues.contains(v)) return true;
+      if (falses.contains(v)) return true;
+      return false;
+    }
     return false;
   }
 
-  static bool toBool(v) {
+  static bool toBool(v,
+      {List<String> trues: const ['true', 'True'],
+      List<String> falses: const ['false', 'False']}) {
     if (v == null) return null;
     if (v is bool) return v;
     if (v is num) return v != 0;
     if (v is String) {
-      if (['true', 'True', 'TRUE'].contains(v)) return true;
-      if (['false', 'False', 'FALSE'].contains(v)) return false;
+      if (trues.contains(v)) return true;
+      if (falses.contains(v)) return false;
+      throw new Exception('Trying to convert a non-bool to bool!');
     }
     throw new Exception('Trying to convert a non-bool to bool!');
   }
@@ -174,11 +184,17 @@ class TypeConverter {
   static Iterable<Map> toNumColumn(Iterable<Map> list, label) =>
       list..forEach((m) => m[label] = toNum(m[label]));
 
-  static bool isBoolColumn(Iterable<Map> list, label) =>
-      list.every((m) => isBool(m[label]));
+  static bool isBoolColumn(Iterable<Map> list, label,
+          {List<String> trues: const ['true', 'True'],
+          List<String> falses: const ['false', 'False']}) =>
+      list.every((m) => isBool(m[label], trues: trues, falses: falses));
 
-  static Iterable<Map> toBoolColumn(Iterable<Map> list, label) =>
-      list..forEach((m) => m[label] = toBool(m[label]));
+  static Iterable<Map> toBoolColumn(Iterable<Map> list, label,
+          {List<String> trues: const ['true', 'True'],
+          List<String> falses: const ['false', 'False']}) =>
+      list
+        ..forEach(
+            (m) => m[label] = toBool(m[label], trues: trues, falses: falses));
 
   static bool isDateTimeColumn(Iterable<Map> list, label,
           {String format: defDateTimeFormat,
@@ -222,3 +238,84 @@ class TypeConverter {
 }
 
 typedef TransformFunc<OT> = OT Function(dynamic v);
+
+class LabeledTable extends Object with ListMixin<Map> {
+  /// Labels/columns
+  final Set<dynamic> labels;
+
+  final List<Map> data;
+
+  LabeledTable(Iterable labels, this.data): labels = new Set.from(labels);
+
+  /*    List interface implementation    */
+
+  Map operator [](int index) => data[index];
+
+  void operator []=(int index, Map value) => data[index] = value;
+
+  int get length => data.length;
+
+  set length(int newLength) => data.length = newLength;
+
+  LabeledTable columnToInt(column) {
+    TypeConverter.toIntColumn(data, column);
+    return this;
+  }
+
+  LabeledTable columnToDouble(column) {
+    TypeConverter.toDoubleColumn(data, column);
+    return this;
+  }
+
+  LabeledTable columnToNum(column) {
+    TypeConverter.toNumColumn(data, column);
+    return this;
+  }
+
+  LabeledTable columnToBool(column,
+          {List<String> trues: const ['true', 'True'],
+          List<String> falses: const ['false', 'False']}) {
+    TypeConverter.toBoolColumn(data, column, trues: trues, falses: falses);
+    return this;
+  }
+
+  LabeledTable columnToDateTime(column,
+          {String format: TypeConverter.defDateTimeFormat,
+          String locale,
+          bool isUtc: false}) {
+    TypeConverter.toDateTimeColumn(data, column,
+        format: format, locale: locale, isUtc: isUtc);
+    return this;
+  }
+
+  /// Adds or updates column with label [label] with given values [values]
+  LabeledTable addColumn<T>(label, Iterable<T> values) {
+    labels.add(label);
+    final int len = math.min(values.length, length);
+
+    Iterator<T> it = values.iterator;
+    it.moveNext();
+    for (int i = 0; i < len; i++) {
+      if(data[i] is! Map) data[i] = {};
+      data[i][label] = it.current;
+      it.moveNext();
+    }
+
+    return this;
+  }
+
+  /// Removes the column with label [label]
+  LabeledTable removeColumn<T>(label) {
+    labels.remove(label);
+
+    for (int i = 0; i < length; i++) {
+      data[i]?.remove(label);
+    }
+
+    return this;
+  }
+}
+
+class Table {
+  //TODO
+}
