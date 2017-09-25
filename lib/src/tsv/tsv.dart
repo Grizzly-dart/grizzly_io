@@ -18,7 +18,7 @@ LabeledTable parseLabTsv(String buffer) {
     final List row = rows[i];
     final int len = math.min(row.length, labels.length);
 
-    final Map d = {};
+    final d = <String, dynamic>{};
 
     for (int j = 0; j < len; j++) {
       d[labels[j]] = row[j];
