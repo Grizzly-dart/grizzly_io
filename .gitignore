@@ -10,3 +10,4 @@ doc/api/
 
 .idea
 grizzly_io.iml
+.dart_tool

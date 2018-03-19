@@ -1,17 +1,29 @@
 /// Provides [CsvParser] class to parse CSV-like file formats
 ///
-/// [csvParser] convenience function creates a [CsvParser] with given settings
+/// [parseCsv] and [parseLCsv]  are convenience function to parse CSV
+/// and labeled CSV respectively.
 ///
 /// Static method [CsvParser.parseRow] can be used parse a single row.
 library grizzly.io.csv.parser;
 
 import 'dart:convert';
+import 'package:grizzly_io/src/type_converter/type_converter.dart'
+    show LabeledTable;
 
-/// Creates a CSV parser with given field separator [fieldSep], text separator
-/// [textSep] and multiline [multiline]
-CsvParser csvParser(
+/// Parses the given CSV buffer
+List<List<String>> parseCsv(String buffer,
         {String fieldSep: ',', String textSep: '"', bool multiline: true}) =>
-    new CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline);
+    new CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
+        .convert(buffer);
+
+/// Parses the given labeled CSV buffer
+LabeledTable parseLCsv(String buffer,
+        {String fieldSep: ',',
+        String textSep: '"',
+        bool multiline: true,
+        int headerRow: 0}) =>
+    new CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
+        .convertLabeled(buffer);
 
 /// Parser of CSV-like file formats
 class CsvParser {
@@ -31,6 +43,9 @@ class CsvParser {
   const CsvParser(
       {this.fieldSep: ',', this.textSep: '"', this.multiline: true});
 
+  LabeledTable convertLabeled(String csv, {int headerRow: 0}) =>
+      new LabeledTable.from(convert(csv), headerRow: headerRow);
+
   /// Parses single CSV row [csv]
   ///
   /// If the row spans multiple lines, returns null.
@@ -41,7 +56,7 @@ class CsvParser {
   List<String> convertRow(String csv) =>
       parseRow(csv, fs: fieldSep, ts: textSep);
 
-  List<List> convert(String buffer, {bool multiline: true}) {
+  List<List<String>> convert(String buffer, {bool multiline: true}) {
     final Iterable<String> lines = LineSplitter.split(buffer).toList();
 
     return convertLines(lines, multiline: multiline);
@@ -50,15 +65,16 @@ class CsvParser {
   /// Parses given CSV [lines]
   ///
   /// [multiline] can be used to control if a single row can span multiple lines
-  List<List> convertLines(Iterable<String> lines, {bool multiline: true}) {
+  List<List<String>> convertLines(Iterable<String> lines,
+      {bool multiline: true}) {
     final bool m = multiline ?? this.multiline ?? true;
 
-    final List<List> ret = [];
+    final List<List<String>> ret = [];
 
     String previousLine;
     for (String line in lines) {
       if (previousLine == null) {
-        final List row = parseRow(line, fs: fieldSep, ts: textSep);
+        final List<String> row = parseRow(line, fs: fieldSep, ts: textSep);
         if (row != null) {
           ret.add(row);
         } else {
@@ -67,7 +83,8 @@ class CsvParser {
         }
       } else {
         previousLine = previousLine + '\r\n' + line;
-        final List row = parseRow(previousLine, fs: fieldSep, ts: textSep);
+        final List<String> row =
+            parseRow(previousLine, fs: fieldSep, ts: textSep);
         if (row != null) {
           ret.add(row);
           previousLine = null;

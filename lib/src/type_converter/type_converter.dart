@@ -203,7 +203,7 @@ class TypeConverter {
       list.every((m) =>
           isDateTime(m[label], format: format, locale: locale, isUtc: isUtc));
 
-  static Iterable<Map> toDateTimeColumn(Iterable<Map> list, label,
+  static Iterable<Map> toDateTimeColumn(Iterable<Map> list, String label,
           {String format: defDateTimeFormat,
           String locale,
           bool isUtc: false}) =>
@@ -237,19 +237,58 @@ class TypeConverter {
         });
 }
 
-typedef TransformFunc<OT> = OT Function(dynamic v);
+typedef OT TransformFunc<OT>(dynamic v);
 
 class LabeledTable extends Object with ListMixin<Map> {
   /// Labels/columns
-  final Set<dynamic> labels;
+  final Set<String> columns;
 
-  final List<Map> data;
+  final List<Map<String, dynamic>> data;
 
-  LabeledTable(Iterable labels, this.data): labels = new Set.from(labels);
+  LabeledTable(Iterable<String> labels, this.data, {bool autoConvert: false})
+      : columns = new Set.from(labels) {
+    for (String column in labels) {
+      if (TypeConverter.isIntColumn(data, column)) {
+        TypeConverter.toIntColumn(data, column);
+      } else if (TypeConverter.isDoubleColumn(data, column)) {
+        TypeConverter.toDoubleColumn(data, column);
+      } else if (TypeConverter.isNumColumn(data, column)) {
+        TypeConverter.toNumColumn(data, column);
+      } else if (TypeConverter.isBoolColumn(data, column)) {
+        TypeConverter.toBoolColumn(data, column);
+      } else if (TypeConverter.isDateTimeColumn(data, column)) {
+        TypeConverter.toDateTimeColumn(data, column);
+      }
+    }
+  }
+
+  factory LabeledTable.from(List<List<String>> rows, {int headerRow: 0}) {
+    if (rows.length == 0) return new LabeledTable([], []);
+
+    final List<String> labels = rows[headerRow];
+    final List<Map<String, dynamic>> data = [];
+
+    // Parse the label header
+    for (int i = 0; i < rows.length; i++) {
+      if (i == headerRow) continue;
+
+      final List row = rows[i];
+      final int len = math.min(row.length, labels.length);
+
+      final d = <String, dynamic>{};
+
+      for (int j = 0; j < len; j++) {
+        d[labels[j]] = row[j];
+      }
+      data.add(d);
+    }
+
+    return new LabeledTable(labels, data);
+  }
 
   /*    List interface implementation    */
 
-  Map operator [](int index) => data[index];
+  Map<String, dynamic> operator [](int index) => data[index];
 
   void operator []=(int index, Map value) => data[index] = value;
 
@@ -257,46 +296,17 @@ class LabeledTable extends Object with ListMixin<Map> {
 
   set length(int newLength) => data.length = newLength;
 
-  LabeledTable columnToInt(column) {
-    TypeConverter.toIntColumn(data, column);
-    return this;
-  }
-
-  LabeledTable columnToDouble(column) {
-    TypeConverter.toDoubleColumn(data, column);
-    return this;
-  }
-
-  LabeledTable columnToNum(column) {
-    TypeConverter.toNumColumn(data, column);
-    return this;
-  }
-
-  LabeledTable columnToBool(column,
-          {List<String> trues: const ['true', 'True'],
-          List<String> falses: const ['false', 'False']}) {
-    TypeConverter.toBoolColumn(data, column, trues: trues, falses: falses);
-    return this;
-  }
-
-  LabeledTable columnToDateTime(column,
-          {String format: TypeConverter.defDateTimeFormat,
-          String locale,
-          bool isUtc: false}) {
-    TypeConverter.toDateTimeColumn(data, column,
-        format: format, locale: locale, isUtc: isUtc);
-    return this;
-  }
+  /* Column operations */
 
   /// Adds or updates column with label [label] with given values [values]
-  LabeledTable addColumn<T>(label, Iterable<T> values) {
-    labels.add(label);
+  LabeledTable setColumn<T>(String label, Iterable<T> values) {
+    columns.add(label);
     final int len = math.min(values.length, length);
 
     Iterator<T> it = values.iterator;
     it.moveNext();
     for (int i = 0; i < len; i++) {
-      if(data[i] is! Map) data[i] = {};
+      if (data[i] is! Map) data[i] = {};
       data[i][label] = it.current;
       it.moveNext();
     }
@@ -306,16 +316,73 @@ class LabeledTable extends Object with ListMixin<Map> {
 
   /// Removes the column with label [label]
   LabeledTable removeColumn<T>(label) {
-    labels.remove(label);
+    columns.remove(label);
 
     for (int i = 0; i < length; i++) {
-      data[i]?.remove(label);
+      data[i].remove(label);
     }
 
     return this;
   }
-}
 
-class Table {
-  //TODO
+  List<T> getColumn<T>(String column) {
+    if (!columns.contains(column)) throw new Exception('Column not found!');
+    final ret = new List<T>()..length = length;
+    for (int i = 0; i < length; i++) {
+      ret[i] = data[i][column];
+    }
+    return ret;
+  }
+
+  List getRow(int row) {
+    final ret = new List()..length = columns.length;
+    int i = 0;
+    for (String col in columns) {
+      ret[i] = data[row][col];
+      i++;
+    }
+    return ret;
+  }
+
+  List<List> asList() {
+    final ret = new List<List>()..length = length + 1;
+    ret[0] = columns.toList();
+    for (int i = 1; i <= length; i++) {
+      ret[i] = getRow(i - 1);
+    }
+    return ret;
+  }
+
+  /* Column converters */
+
+  LabeledTable columnToInt(String column) {
+    TypeConverter.toIntColumn(data, column);
+    return this;
+  }
+
+  LabeledTable columnToDouble(String column) {
+    TypeConverter.toDoubleColumn(data, column);
+    return this;
+  }
+
+  LabeledTable columnToNum(String column) {
+    TypeConverter.toNumColumn(data, column);
+    return this;
+  }
+
+  LabeledTable columnToBool(String column,
+      {List<String> trues: const ['true', 'True'],
+      List<String> falses: const ['false', 'False']}) {
+    TypeConverter.toBoolColumn(data, column, trues: trues, falses: falses);
+    return this;
+  }
+
+  LabeledTable columnToDateTime(String column,
+      {String format: TypeConverter.defDateTimeFormat,
+      String locale,
+      bool isUtc: false}) {
+    TypeConverter.toDateTimeColumn(data, column,
+        format: format, locale: locale, isUtc: isUtc);
+    return this;
+  }
 }
