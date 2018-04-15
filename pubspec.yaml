@@ -1,6 +1,6 @@
 name: grizzly_io
 description: Readers and writers for several file formats (CSV, TSV, JSON, YAML, etc)
-version: 1.2.1
+version: 1.2.2
 homepage: https://github.com/tejainece/grizzly_io
 author: Ravi Teja Gudapati <tejainece@gmail.com>
 documentation:

@@ -50,7 +50,7 @@ class TypeConverter {
     return false;
   }
 
-  static int toNum(v) {
+  static num toNum(v) {
     if (v == null) return null;
     if (v is num) return v;
     try {

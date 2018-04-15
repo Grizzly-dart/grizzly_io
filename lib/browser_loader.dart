@@ -45,7 +45,7 @@ Future<LabeledTable> requestLTsv(String url) async {
 }
 
 /// Reads file/blob as labeled TSV file
-Future<LabeledTable> readLTsv(Blob file, {Encoding encoding: UTF8}) async {
+Future<LabeledTable> readLTsv(Blob file, {Encoding encoding: utf8}) async {
   FileReader reader = new FileReader();
   reader.readAsText(file);
   await reader.onLoadEnd.first;

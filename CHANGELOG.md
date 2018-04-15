@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+
++ Bug fix: `TypeConverter.toNum`
+
 ## 1.2.1
 
 + Breaking changes to `LabeledTsv`

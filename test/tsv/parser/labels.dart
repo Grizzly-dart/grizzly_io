@@ -2,7 +2,6 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'dart:io';
-import 'dart:async';
 import 'package:grizzly_io/grizzly_io.dart';
 import 'package:test/test.dart';
 

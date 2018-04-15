@@ -2,7 +2,7 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'package:grizzly_io/grizzly_io.dart';
-import 'package:grizzly_io/src/csv/parser/parser.dart';
+// import 'package:grizzly_io/src/csv/parser/parser.dart';
 import 'package:grizzly_io/io_loader.dart';
 
 main() async {

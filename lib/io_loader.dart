@@ -46,7 +46,7 @@ Future<LabeledTable> requestLTsv(String url) async {
 
 /// Reads file at specified path [path] as TSV file
 Future<List<List<String>>> readCsv(String path,
-    {Encoding encoding: UTF8,
+    {Encoding encoding: utf8,
     String fieldSep: ',',
     String textSep: '"',
     bool multiline: true,
@@ -59,7 +59,7 @@ Future<List<List<String>>> readCsv(String path,
 
 /// Reads file at specified path [path] as TSV file
 Future<LabeledTable> readLCsv(String path,
-    {Encoding encoding: UTF8,
+    {Encoding encoding: utf8,
     String fieldSep: ',',
     String textSep: '"',
     bool multiline: true,
@@ -74,7 +74,7 @@ Future<LabeledTable> readLCsv(String path,
 }
 
 /// Reads file at specified path [path] as TSV file
-Future<LabeledTable> readLTsv(String path, {Encoding encoding: UTF8}) async {
+Future<LabeledTable> readLTsv(String path, {Encoding encoding: utf8}) async {
   final File file = new File(path);
   if (!await file.exists()) throw new Exception('File not found!');
   return parseLTsv(await file.readAsString(encoding: encoding));
