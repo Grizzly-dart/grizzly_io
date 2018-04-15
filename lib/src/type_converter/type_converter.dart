@@ -3,7 +3,7 @@ library grizzly.io.transform;
 
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
-import 'dart:collection';
+import 'package:grizzly_io/src/csv/writer.dart';
 
 /// Utility functions to convert dynamic columns in tables to typed columns
 class TypeConverter {
@@ -143,9 +143,15 @@ class TypeConverter {
   static List<num> toNumList(Iterable list) => list.map(toNum).toList();
 
   /// Checks that if `List` [list] can be a `List<bool>`
-  static bool isBoolList(Iterable list) => list.every(isBool);
+  static bool isBoolList(Iterable list,
+          {List<String> trues: const ['true', 'True'],
+          List<String> falses: const ['false', 'False']}) =>
+      list.every((e) => isBool(e, trues: trues, falses: falses));
 
-  static List<bool> toBoolList(Iterable list) => list.map(toBool).toList();
+  static List<bool> toBoolList(Iterable list,
+          {List<String> trues: const ['true', 'True'],
+          List<String> falses: const ['false', 'False']}) =>
+      list.map((e) => toBool(e, trues: trues, falses: falses)).toList();
 
   static bool isDateTimeList(Iterable list,
           {String format: defDateTimeFormat,
@@ -154,7 +160,7 @@ class TypeConverter {
       list.every(
           (v) => isDateTime(v, format: format, locale: locale, isUtc: isUtc));
 
-  static List<DateTime> toDateList(Iterable list,
+  static List<DateTime> toDateTimeList(Iterable list,
           {String format: defDateTimeFormat,
           String locale,
           bool isUtc: false}) =>
@@ -239,14 +245,14 @@ class TypeConverter {
 
 typedef OT TransformFunc<OT>(dynamic v);
 
-class LabeledTable extends Object with ListMixin<Map> {
+class LabeledTable {
   /// Labels/columns
-  final Set<String> columns;
+  final List<String> columns;
 
   final List<Map<String, dynamic>> data;
 
   LabeledTable(Iterable<String> labels, this.data, {bool autoConvert: false})
-      : columns = new Set.from(labels) {
+      : columns = labels.toList() {
     for (String column in labels) {
       if (TypeConverter.isIntColumn(data, column)) {
         TypeConverter.toIntColumn(data, column);
@@ -293,8 +299,6 @@ class LabeledTable extends Object with ListMixin<Map> {
   void operator []=(int index, Map value) => data[index] = value;
 
   int get length => data.length;
-
-  set length(int newLength) => data.length = newLength;
 
   /* Column operations */
 
@@ -344,7 +348,7 @@ class LabeledTable extends Object with ListMixin<Map> {
     return ret;
   }
 
-  List<List> asList() {
+  List<List> toList() {
     final ret = new List<List>()..length = length + 1;
     ret[0] = columns.toList();
     for (int i = 1; i <= length; i++) {
@@ -355,34 +359,54 @@ class LabeledTable extends Object with ListMixin<Map> {
 
   /* Column converters */
 
-  LabeledTable columnToInt(String column) {
+  List<int> columnAsInt(String column) =>
+      TypeConverter.toIntList(getColumn(column));
+
+  List<double> columnAsDouble(String column) =>
+      TypeConverter.toDoubleList(getColumn(column));
+
+  List<num> columnAsNum(String column) =>
+      TypeConverter.toNumList(getColumn(column));
+
+  List<bool> columnAsBool(String column,
+          {List<String> trues: const ['true', 'True'],
+          List<String> falses: const ['false', 'False']}) =>
+      TypeConverter.toBoolList(getColumn(column), trues: trues, falses: falses);
+
+  List<DateTime> columnAsDateTime(String column,
+          {String format: TypeConverter.defDateTimeFormat,
+          String locale,
+          bool isUtc: false}) =>
+      TypeConverter.toDateTimeList(getColumn(column),
+          format: format, locale: locale, isUtc: isUtc);
+
+  /* Column casters */
+
+  void columnToInt(String column) {
     TypeConverter.toIntColumn(data, column);
-    return this;
   }
 
-  LabeledTable columnToDouble(String column) {
+  void columnToDouble(String column) {
     TypeConverter.toDoubleColumn(data, column);
-    return this;
   }
 
-  LabeledTable columnToNum(String column) {
+  void columnToNum(String column) {
     TypeConverter.toNumColumn(data, column);
-    return this;
   }
 
-  LabeledTable columnToBool(String column,
+  void columnToBool(String column,
       {List<String> trues: const ['true', 'True'],
       List<String> falses: const ['false', 'False']}) {
     TypeConverter.toBoolColumn(data, column, trues: trues, falses: falses);
-    return this;
   }
 
-  LabeledTable columnToDateTime(String column,
+  void columnToDateTime(String column,
       {String format: TypeConverter.defDateTimeFormat,
       String locale,
       bool isUtc: false}) {
     TypeConverter.toDateTimeColumn(data, column,
         format: format, locale: locale, isUtc: isUtc);
-    return this;
   }
+
+  String toString() => encodeCsv(toList(), fieldSep: '\t');
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
++ Breaking changes to `LabeledTsv`
+
 ## 0.0.4
 
 - Replaced `LabeledTsv` with `parseLabTsv` and `toLabTsv`

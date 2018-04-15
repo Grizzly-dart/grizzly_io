@@ -23,7 +23,7 @@ main() async {
   */
   var tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
   print(tsv);
-  final out = encodeCsv(tsv.asList(), fieldSep: '\t');
+  final out = encodeCsv(tsv.toList(), fieldSep: '\t');
   print(out);
   tsv = await parseLTsv(out);
   print(tsv);
