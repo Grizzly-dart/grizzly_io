@@ -23,7 +23,7 @@ class TypeConverter {
     try {
       if (v is String) return int.parse(v);
     } catch (_) {}
-    throw new Exception('Trying to convert a non-integer to int!');
+    throw Exception('Trying to convert a non-integer to int!');
   }
 
   static bool isDouble(v) {
@@ -40,7 +40,7 @@ class TypeConverter {
     try {
       if (v is String) return double.parse(v);
     } catch (_) {}
-    throw new Exception('Trying to convert a non-double to double!');
+    throw Exception('Trying to convert a non-double to double!');
   }
 
   static bool isNum(v) {
@@ -56,12 +56,12 @@ class TypeConverter {
     try {
       if (v is String) return num.parse(v);
     } catch (_) {}
-    throw new Exception('Trying to convert a non-num to num!');
+    throw Exception('Trying to convert a non-num to num!');
   }
 
   static bool isBool(v,
-      {List<String> trues: const ['true', 'True'],
-      List<String> falses: const ['false', 'False']}) {
+      {List<String> trues = const ['true', 'True'],
+      List<String> falses = const ['false', 'False']}) {
     if (v == null) return true;
     if (v is bool) return true;
     if (v is num) return true;
@@ -74,21 +74,21 @@ class TypeConverter {
   }
 
   static bool toBool(v,
-      {List<String> trues: const ['true', 'True'],
-      List<String> falses: const ['false', 'False']}) {
+      {List<String> trues = const ['true', 'True'],
+      List<String> falses = const ['false', 'False']}) {
     if (v == null) return null;
     if (v is bool) return v;
     if (v is num) return v != 0;
     if (v is String) {
       if (trues.contains(v)) return true;
       if (falses.contains(v)) return false;
-      throw new Exception('Trying to convert a non-bool to bool!');
+      throw Exception('Trying to convert a non-bool to bool!');
     }
-    throw new Exception('Trying to convert a non-bool to bool!');
+    throw Exception('Trying to convert a non-bool to bool!');
   }
 
   static bool isDateTime(v,
-      {String format: defDateTimeFormat, String locale, bool isUtc: false}) {
+      {String format = defDateTimeFormat, String locale, bool isUtc = false}) {
     if (v == null) return true;
     if (v is num) return true;
     if (v is DateTime) return true;
@@ -96,7 +96,7 @@ class TypeConverter {
       final num n = num.tryParse(v);
       if (n != null) return true;
 
-      final df = new DateFormat(format, locale);
+      final df = DateFormat(format, locale);
       try {
         df.parse(v, isUtc);
         return true;
@@ -108,22 +108,22 @@ class TypeConverter {
   }
 
   static DateTime toDateTime(v,
-      {String format: defDateTimeFormat, String locale, bool isUtc: false}) {
+      {String format = defDateTimeFormat, String locale, bool isUtc = false}) {
     if (v == null) return null;
-    if (v is num) return new DateTime.fromMillisecondsSinceEpoch(v.toInt());
+    if (v is num) return DateTime.fromMillisecondsSinceEpoch(v.toInt());
     if (v is DateTime) return v;
     if (v is String) {
       final num n = num.tryParse(v);
-      if (n != null) new DateTime.fromMillisecondsSinceEpoch(n.toInt());
+      if (n != null) DateTime.fromMillisecondsSinceEpoch(n.toInt());
 
-      final df = new DateFormat(format, locale);
+      final df = DateFormat(format, locale);
       try {
         return df.parse(v, isUtc);
       } catch (e) {
-        throw new Exception('Trying to convert a non-DateTime to DateTime!');
+        throw Exception('Trying to convert a non-DateTime to DateTime!');
       }
     }
-    throw new Exception('Trying to convert a non-DateTime to DateTime!');
+    throw Exception('Trying to convert a non-DateTime to DateTime!');
   }
 
   /// Checks that if `List` [list] can be a `List<int>`
@@ -144,26 +144,26 @@ class TypeConverter {
 
   /// Checks that if `List` [list] can be a `List<bool>`
   static bool isBoolList(Iterable list,
-          {List<String> trues: const ['true', 'True'],
-          List<String> falses: const ['false', 'False']}) =>
+          {List<String> trues = const ['true', 'True'],
+          List<String> falses = const ['false', 'False']}) =>
       list.every((e) => isBool(e, trues: trues, falses: falses));
 
   static List<bool> toBoolList(Iterable list,
-          {List<String> trues: const ['true', 'True'],
-          List<String> falses: const ['false', 'False']}) =>
+          {List<String> trues = const ['true', 'True'],
+          List<String> falses = const ['false', 'False']}) =>
       list.map((e) => toBool(e, trues: trues, falses: falses)).toList();
 
   static bool isDateTimeList(Iterable list,
-          {String format: defDateTimeFormat,
+          {String format = defDateTimeFormat,
           String locale,
-          bool isUtc: false}) =>
+          bool isUtc = false}) =>
       list.every(
           (v) => isDateTime(v, format: format, locale: locale, isUtc: isUtc));
 
   static List<DateTime> toDateTimeList(Iterable list,
-          {String format: defDateTimeFormat,
+          {String format = defDateTimeFormat,
           String locale,
-          bool isUtc: false}) =>
+          bool isUtc = false}) =>
       list
           .map((v) =>
               toDateTime(v, format: format, locale: locale, isUtc: isUtc))
@@ -191,35 +191,35 @@ class TypeConverter {
       list..forEach((m) => m[label] = toNum(m[label]));
 
   static bool isBoolColumn(Iterable<Map> list, label,
-          {List<String> trues: const ['true', 'True'],
-          List<String> falses: const ['false', 'False']}) =>
+          {List<String> trues = const ['true', 'True'],
+          List<String> falses = const ['false', 'False']}) =>
       list.every((m) => isBool(m[label], trues: trues, falses: falses));
 
   static Iterable<Map> toBoolColumn(Iterable<Map> list, label,
-          {List<String> trues: const ['true', 'True'],
-          List<String> falses: const ['false', 'False']}) =>
+          {List<String> trues = const ['true', 'True'],
+          List<String> falses = const ['false', 'False']}) =>
       list
         ..forEach(
             (m) => m[label] = toBool(m[label], trues: trues, falses: falses));
 
   static bool isDateTimeColumn(Iterable<Map> list, label,
-          {String format: defDateTimeFormat,
+          {String format = defDateTimeFormat,
           String locale,
-          bool isUtc: false}) =>
+          bool isUtc = false}) =>
       list.every((m) =>
           isDateTime(m[label], format: format, locale: locale, isUtc: isUtc));
 
   static Iterable<Map> toDateTimeColumn(Iterable<Map> list, String label,
-          {String format: defDateTimeFormat,
+          {String format = defDateTimeFormat,
           String locale,
-          bool isUtc: false}) =>
+          bool isUtc = false}) =>
       list
         ..forEach((m) => m[label] =
             toDateTime(m[label], format: format, locale: locale, isUtc: isUtc));
 
   static List<List> convertLists(
       Iterable<Iterable> list, Map<int, TransformFunc> labelOps) {
-    final List<List> ret = new List<List>(list.length);
+    final List<List> ret = List<List>(list.length);
 
     Iterator<Iterable> iterator = list.iterator;
     for (int i = 0; i < list.length; i++) {
@@ -251,7 +251,7 @@ class LabeledTable {
 
   final List<Map<String, dynamic>> data;
 
-  LabeledTable(Iterable<String> labels, this.data, {bool autoConvert: false})
+  LabeledTable(Iterable<String> labels, this.data, {bool autoConvert = false})
       : columns = labels.toList() {
     for (String column in labels) {
       if (TypeConverter.isIntColumn(data, column)) {
@@ -268,8 +268,8 @@ class LabeledTable {
     }
   }
 
-  factory LabeledTable.from(List<List<String>> rows, {int headerRow: 0}) {
-    if (rows.length == 0) return new LabeledTable([], []);
+  factory LabeledTable.from(List<List<String>> rows, {int headerRow = 0}) {
+    if (rows.isEmpty) return LabeledTable([], []);
 
     final List<String> labels = rows[headerRow];
     final List<Map<String, dynamic>> data = [];
@@ -289,7 +289,7 @@ class LabeledTable {
       data.add(d);
     }
 
-    return new LabeledTable(labels, data);
+    return LabeledTable(labels, data);
   }
 
   /*    List interface implementation    */
@@ -330,8 +330,8 @@ class LabeledTable {
   }
 
   List<T> getColumn<T>(String column) {
-    if (!columns.contains(column)) throw new Exception('Column not found!');
-    final ret = new List<T>()..length = length;
+    if (!columns.contains(column)) throw Exception('Column not found!');
+    final ret = []..length = length;
     for (int i = 0; i < length; i++) {
       ret[i] = data[i][column];
     }
@@ -339,7 +339,7 @@ class LabeledTable {
   }
 
   List getRow(int row) {
-    final ret = new List()..length = columns.length;
+    final ret = []..length = columns.length;
     int i = 0;
     for (String col in columns) {
       ret[i] = data[row][col];
@@ -349,7 +349,7 @@ class LabeledTable {
   }
 
   List<List> toList() {
-    final ret = new List<List>()..length = length + 1;
+    final ret = []..length = length + 1;
     ret[0] = columns.toList();
     for (int i = 1; i <= length; i++) {
       ret[i] = getRow(i - 1);
@@ -369,14 +369,14 @@ class LabeledTable {
       TypeConverter.toNumList(getColumn(column));
 
   List<bool> columnAsBool(String column,
-          {List<String> trues: const ['true', 'True'],
-          List<String> falses: const ['false', 'False']}) =>
+          {List<String> trues = const ['true', 'True'],
+          List<String> falses = const ['false', 'False']}) =>
       TypeConverter.toBoolList(getColumn(column), trues: trues, falses: falses);
 
   List<DateTime> columnAsDateTime(String column,
-          {String format: TypeConverter.defDateTimeFormat,
+          {String format = TypeConverter.defDateTimeFormat,
           String locale,
-          bool isUtc: false}) =>
+          bool isUtc = false}) =>
       TypeConverter.toDateTimeList(getColumn(column),
           format: format, locale: locale, isUtc: isUtc);
 
@@ -395,15 +395,15 @@ class LabeledTable {
   }
 
   void columnToBool(String column,
-      {List<String> trues: const ['true', 'True'],
-      List<String> falses: const ['false', 'False']}) {
+      {List<String> trues = const ['true', 'True'],
+      List<String> falses = const ['false', 'False']}) {
     TypeConverter.toBoolColumn(data, column, trues: trues, falses: falses);
   }
 
   void columnToDateTime(String column,
-      {String format: TypeConverter.defDateTimeFormat,
+      {String format = TypeConverter.defDateTimeFormat,
       String locale,
-      bool isUtc: false}) {
+      bool isUtc = false}) {
     TypeConverter.toDateTimeColumn(data, column,
         format: format, locale: locale, isUtc: isUtc);
   }

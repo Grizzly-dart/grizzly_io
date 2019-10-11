@@ -1,5 +1,5 @@
-import 'parser/labels.dart' as parserTest;
+import 'parser/labels.dart' as parser_test;
 
 void main() {
-  parserTest.main();
+  parser_test.main();
 }

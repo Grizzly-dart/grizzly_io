@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
++ Analyzer warning fixes
+
 ## 2.0.0
 
 + Dart 2.0.0 support

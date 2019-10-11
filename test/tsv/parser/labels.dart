@@ -10,7 +10,7 @@ void main() {
     setUp(() {});
 
     test('Normal', () {
-      final file = new File('data/labeled_tsv/normal.tsv');
+      final file = File('data/labeled_tsv/normal.tsv');
       final tsv = parseLTsv(file.readAsStringSync());
       expect(tsv.columns, ['Name', 'Age', 'House']);
       expect(tsv.data, hasLength(4));
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('Quoted', () {
-      final file = new File('data/labeled_tsv/headers/quoted.tsv');
+      final file = File('data/labeled_tsv/headers/quoted.tsv');
       final tsv = parseLTsv(file.readAsStringSync());
       expect(tsv.columns, ['Name', 'Age', 'House']);
       expect(tsv.data, hasLength(4));
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('Tab in label', () {
-      final file = new File('data/labeled_tsv/headers/tab_in_label.tsv');
+      final file = File('data/labeled_tsv/headers/tab_in_label.tsv');
       final tsv = parseLTsv(file.readAsStringSync());
       expect(tsv.columns, ['Name', 'Age', 'House\t(h)']);
       expect(tsv.data, hasLength(4));

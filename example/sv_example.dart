@@ -5,7 +5,7 @@ import 'package:grizzly_io/grizzly_io.dart';
 // import 'package:grizzly_io/src/csv/parser/parser.dart';
 import 'package:grizzly_io/io_loader.dart';
 
-main() async {
+Future<void> main() async {
   /*
   String fs = r',';
   String ts = r"'";
@@ -21,10 +21,11 @@ main() async {
     cols.forEach(print);
   }
   */
-  var tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
+  LabeledTable tsv =
+      await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
   print(tsv);
   final out = encodeCsv(tsv.toList(), fieldSep: '\t');
   print(out);
-  tsv = await parseLTsv(out);
+  tsv = parseLTsv(out);
   print(tsv);
 }

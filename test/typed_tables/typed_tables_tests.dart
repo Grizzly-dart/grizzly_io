@@ -1,5 +1,5 @@
-import 'datetime.dart' as datetimeTests;
+import 'datetime.dart' as datetime_tests;
 
 void main() {
-  datetimeTests.main();
+  datetime_tests.main();
 }
