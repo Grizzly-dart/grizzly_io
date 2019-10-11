@@ -12,7 +12,7 @@ class TypeConverter {
   static bool isInt(v) {
     if (v == null) return true;
     if (v is num) return true;
-    if (v is String) return int.parse(v, onError: (_) => null) != null;
+    if (v is String) return int.tryParse(v) != null;
     return false;
   }
 
@@ -29,7 +29,7 @@ class TypeConverter {
   static bool isDouble(v) {
     if (v == null) return true;
     if (v is num) return true;
-    if (v is String) return double.parse(v, (_) => null) != null;
+    if (v is String) return double.tryParse(v) != null;
     return false;
   }
 
@@ -46,7 +46,7 @@ class TypeConverter {
   static bool isNum(v) {
     if (v == null) return true;
     if (v is num) return true;
-    if (v is String) return num.parse(v, (_) => null) != null;
+    if (v is String) return num.tryParse(v) != null;
     return false;
   }
 
@@ -93,7 +93,7 @@ class TypeConverter {
     if (v is num) return true;
     if (v is DateTime) return true;
     if (v is String) {
-      final num n = num.parse(v, (_) => null);
+      final num n = num.tryParse(v);
       if (n != null) return true;
 
       final df = new DateFormat(format, locale);
@@ -113,7 +113,7 @@ class TypeConverter {
     if (v is num) return new DateTime.fromMillisecondsSinceEpoch(v.toInt());
     if (v is DateTime) return v;
     if (v is String) {
-      final num n = num.parse(v, (_) => null);
+      final num n = num.tryParse(v);
       if (n != null) new DateTime.fromMillisecondsSinceEpoch(n.toInt());
 
       final df = new DateFormat(format, locale);

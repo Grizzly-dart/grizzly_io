@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0
+
++ Dart 2.0.0 support
+
 ## 1.2.2
 
 + Bug fix: `TypeConverter.toNum`
