@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0
+
++ Renamed `LabledTable` to `Table`
+
 ## 2.0.1
 
 + Analyzer warning fixes

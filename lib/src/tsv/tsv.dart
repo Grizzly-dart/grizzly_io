@@ -9,4 +9,4 @@ const CsvParser tsvParser = CsvParser(fieldSep: '\t');
 List<List<String>> parseTsv(String buffer) => tsvParser.convert(buffer);
 
 /// Parses the given labeled TSV buffer
-LabeledTable parseLTsv(String buffer) => tsvParser.convertLabeled(buffer);
+Table parseLTsv(String buffer) => tsvParser.convertLabeled(buffer);

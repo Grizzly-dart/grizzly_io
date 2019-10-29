@@ -8,7 +8,7 @@ library grizzly.io.csv.parser;
 
 import 'dart:convert';
 import 'package:grizzly_io/src/type_converter/type_converter.dart'
-    show LabeledTable;
+    show Table;
 
 /// Parses the given CSV buffer
 List<List<String>> parseCsv(String buffer,
@@ -17,7 +17,7 @@ List<List<String>> parseCsv(String buffer,
         .convert(buffer);
 
 /// Parses the given labeled CSV buffer
-LabeledTable parseLCsv(String buffer,
+Table parseLCsv(String buffer,
         {String fieldSep = ',',
         String textSep = '"',
         bool multiline = true,
@@ -43,8 +43,8 @@ class CsvParser {
   const CsvParser(
       {this.fieldSep = ',', this.textSep = '"', this.multiline = true});
 
-  LabeledTable convertLabeled(String csv, {int headerRow = 0}) =>
-      LabeledTable.from(convert(csv), headerRow: headerRow);
+  Table convertLabeled(String csv, {int headerRow = 0}) =>
+      Table.from(convert(csv), headerRow: headerRow);
 
   /// Parses single CSV row [csv]
   ///

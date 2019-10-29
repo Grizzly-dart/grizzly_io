@@ -21,7 +21,7 @@ Future<void> main() async {
     cols.forEach(print);
   }
   */
-  LabeledTable tsv =
+  Table tsv =
       await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
   print(tsv);
   final out = encodeCsv(tsv.toList(), fieldSep: '\t');

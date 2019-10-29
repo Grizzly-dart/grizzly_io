@@ -6,6 +6,6 @@
 /// [csvParser] convenience function creates a [CsvParser] with given settings
 ///
 /// Static method [CsvParser.parseRow] can be used parse a single row.
-library grizzly.io;
+library grizzly.io.csv_parser;
 
 export 'src/csv/parser/parser.dart';

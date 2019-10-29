@@ -14,7 +14,7 @@ import 'package:grizzly_io/grizzly_io.dart';
 export 'package:grizzly_io/grizzly_io.dart';
 
 /// Downloads the TSV file from specified [url] and returns the parsed data
-Future<LabeledTable> requestLCsv(String url,
+Future<Table> requestLCsv(String url,
     {String fieldSep = ',',
     String textSep = '"',
     bool multiline = true,
@@ -40,7 +40,7 @@ Future<List<List<String>>> requestCsv(String url,
 }
 
 /// Downloads the TSV file from specified [url] and returns the parsed data
-Future<LabeledTable> requestLTsv(String url) async {
+Future<Table> requestLTsv(String url) async {
   final client = Client();
   final Response resp = await client.get(url);
   return parseLTsv(resp.body);
@@ -60,7 +60,7 @@ Future<List<List<String>>> readCsv(String path,
 }
 
 /// Reads file at specified path [path] as TSV file
-Future<LabeledTable> readLCsv(String path,
+Future<Table> readLCsv(String path,
     {Encoding encoding = utf8,
     String fieldSep = ',',
     String textSep = '"',
@@ -76,7 +76,7 @@ Future<LabeledTable> readLCsv(String path,
 }
 
 /// Reads file at specified path [path] as TSV file
-Future<LabeledTable> readLTsv(String path, {Encoding encoding = utf8}) async {
+Future<Table> readLTsv(String path, {Encoding encoding = utf8}) async {
   final File file = File(path);
   if (!await file.exists()) throw Exception('File not found!');
   return parseLTsv(await file.readAsString(encoding: encoding));
