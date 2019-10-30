@@ -23,10 +23,7 @@ Future<Table> requestLCsv(String url,
   final client = BrowserClient();
   final Response resp = await client.get(url);
   return parseLCsv(resp.body,
-      fieldSep: fieldSep,
-      textSep: textSep,
-      multiline: multiline,
-      headerRow: headerRow);
+      fieldSep: fieldSep, textSep: textSep, multiline: multiline);
 }
 
 /// Downloads the TSV file from specified [url] and returns the parsed data

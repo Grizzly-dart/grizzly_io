@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0
+
++ Combined `Rows` and `Columns` into `Table`
+
 ## 2.1.0
 
 + Renamed `LabledTable` to `Table`

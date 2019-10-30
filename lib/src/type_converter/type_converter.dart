@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 export 'table.dart';
 
 /// Utility functions to convert dynamic columns in tables to typed columns
-class TypeConverter {
+class ColumnConverter {
   static const String defDateTimeFormat = 'yyyy-MM-dd';
 
   static bool isInt(v) {
@@ -127,120 +127,45 @@ class TypeConverter {
   }
 
   /// Checks that if `List` [list] can be a `List<int>`
-  static bool isIntList(Iterable list) => list.every(isInt);
+  static bool isInts(Iterable list) => list.every(isInt);
 
-  static List<int> toIntList(Iterable list) => list.map(toInt).toList();
+  static Iterable<int> toInts(Iterable list) => list.map(toInt);
 
   /// Checks that if `List` [list] can be a `List<double>`
-  static bool isDoubleList(Iterable list) => list.every(isDouble);
+  static bool isDoubles(Iterable list) => list.every(isDouble);
 
-  static List<double> toDoubleList(Iterable list) =>
-      list.map(toDouble).toList();
+  static Iterable<double> toDoubles(Iterable list) => list.map(toDouble);
 
   /// Checks that if `List` [list] can be a `List<num>`
-  static bool isNumList(Iterable list) => list.every(isNum);
+  static bool isNums(Iterable list) => list.every(isNum);
 
-  static List<num> toNumList(Iterable list) => list.map(toNum).toList();
+  static Iterable<num> toNums(Iterable list) => list.map(toNum);
 
   /// Checks that if `List` [list] can be a `List<bool>`
-  static bool isBoolList(Iterable list,
+  static bool isBools(Iterable list,
           {List<String> trues = const ['true', 'True'],
           List<String> falses = const ['false', 'False']}) =>
       list.every((e) => isBool(e, trues: trues, falses: falses));
 
-  static List<bool> toBoolList(Iterable list,
+  static Iterable<bool> toBools(Iterable list,
           {List<String> trues = const ['true', 'True'],
           List<String> falses = const ['false', 'False']}) =>
-      list.map((e) => toBool(e, trues: trues, falses: falses)).toList();
+      list.map((e) => toBool(e, trues: trues, falses: falses));
 
-  static bool isDateTimeList(Iterable list,
+  static bool isDateTimes(Iterable list,
           {String format = defDateTimeFormat,
           String locale,
           bool isUtc = false}) =>
       list.every(
           (v) => isDateTime(v, format: format, locale: locale, isUtc: isUtc));
 
-  static List<DateTime> toDateTimeList(Iterable list,
+  static Iterable<DateTime> toDateTimes(Iterable list,
           {String format = defDateTimeFormat,
           String locale,
           bool isUtc = false}) =>
-      list
-          .map((v) =>
-              toDateTime(v, format: format, locale: locale, isUtc: isUtc))
-          .toList();
+      list.map(
+          (v) => toDateTime(v, format: format, locale: locale, isUtc: isUtc));
 
-  static List<String> toStringList(Iterable list) =>
-      list.map((v) => v?.toString()).toList();
-
-  static bool isIntColumn(Iterable<Map> list, label) =>
-      list.every((m) => isInt(m[label]));
-
-  static Iterable<Map> toIntColumn(Iterable<Map> list, label) =>
-      list..forEach((m) => m[label] = toInt(m[label]));
-
-  static bool isDoubleColumn(Iterable<Map> list, label) =>
-      list.every((m) => isDouble(m[label]));
-
-  static Iterable<Map> toDoubleColumn(Iterable<Map> list, label) =>
-      list..forEach((m) => m[label] = toDouble(m[label]));
-
-  static bool isNumColumn(Iterable<Map> list, label) =>
-      list.every((m) => isNum(m[label]));
-
-  static Iterable<Map> toNumColumn(Iterable<Map> list, label) =>
-      list..forEach((m) => m[label] = toNum(m[label]));
-
-  static bool isBoolColumn(Iterable<Map> list, label,
-          {List<String> trues = const ['true', 'True'],
-          List<String> falses = const ['false', 'False']}) =>
-      list.every((m) => isBool(m[label], trues: trues, falses: falses));
-
-  static Iterable<Map> toBoolColumn(Iterable<Map> list, label,
-          {List<String> trues = const ['true', 'True'],
-          List<String> falses = const ['false', 'False']}) =>
-      list
-        ..forEach(
-            (m) => m[label] = toBool(m[label], trues: trues, falses: falses));
-
-  static bool isDateTimeColumn(Iterable<Map> list, label,
-          {String format = defDateTimeFormat,
-          String locale,
-          bool isUtc = false}) =>
-      list.every((m) =>
-          isDateTime(m[label], format: format, locale: locale, isUtc: isUtc));
-
-  static Iterable<Map> toDateTimeColumn(Iterable<Map> list, String label,
-          {String format = defDateTimeFormat,
-          String locale,
-          bool isUtc = false}) =>
-      list
-        ..forEach((m) => m[label] =
-            toDateTime(m[label], format: format, locale: locale, isUtc: isUtc));
-
-  static List<List> convertLists(
-      Iterable<Iterable> list, Map<int, TransformFunc> labelOps) {
-    final List<List> ret = List<List>(list.length);
-
-    Iterator<Iterable> iterator = list.iterator;
-    for (int i = 0; i < list.length; i++) {
-      iterator.moveNext();
-
-      if (labelOps[i] == null) ret[i] = iterator.current.toList();
-
-      ret[i] = iterator.current.map(labelOps[i]).toList();
-    }
-
-    return ret;
-  }
-
-  static Iterable<Map> convertColumns(
-          Iterable<Map> list, Map<dynamic, TransformFunc> labelOps) =>
-      list
-        ..forEach((m) {
-          labelOps.forEach((label, op) {
-            m[label] = op(m[label]);
-          });
-        });
+  static Iterable<String> toStrings(Iterable list) =>
+      list.map((v) => v?.toString());
 }
-
-typedef TransformFunc<OT> = OT Function(dynamic v);
