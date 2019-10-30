@@ -34,6 +34,30 @@ class Table {
 
   String toString() => toList().toString();
 
+  Map<String, dynamic> rowToMap(int index) {
+    final row = rows[index];
+
+    final ret = <String, dynamic>{};
+
+    for (int i = 0; i < header.length; i++) {
+      ret[header[i]] = row[i];
+    }
+
+    return ret;
+  }
+
+  Iterable<Map<String, dynamic>> toMap() sync* {
+    for(int i = 0; i < rows.length; i++) {
+      yield rowToMap(i);
+    }
+  }
+
+  O rowToObject<O>(int index, O mapper(Map<String, dynamic> row)) =>
+      mapper(rowToMap(index));
+
+  Iterable<O> toObjects<O>(O mapper(Map<String, dynamic> row)) =>
+      toMap().map(mapper);
+
   Iterable<dynamic> column(/* String | int */ index) {
     if (index is String) {
       index = header.indexOf(index);

@@ -29,4 +29,5 @@ Future<void> main() async {
   print(tsv);
 
   print(tsv.columnAsInt("Age"));
+  print(tsv.toMap());
 }
