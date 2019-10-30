@@ -47,7 +47,7 @@ class Table {
   }
 
   Iterable<Map<String, dynamic>> toMap() sync* {
-    for(int i = 0; i < rows.length; i++) {
+    for (int i = 0; i < rows.length; i++) {
       yield rowToMap(i);
     }
   }
@@ -58,12 +58,64 @@ class Table {
   Iterable<O> toObjects<O>(O mapper(Map<String, dynamic> row)) =>
       toMap().map(mapper);
 
-  Iterable<dynamic> column(/* String | int */ index) {
+  int _toIndex(/* String | int */ index) {
     if (index is String) {
       index = header.indexOf(index);
       if (index == -1) throw Exception("columns $index does not exist");
     }
-    return rows.map((r) => r[index]);
+    return index;
+  }
+
+  Iterable<T> column<T>(/* String | int */ index) {
+    index = _toIndex(index);
+    return rows.map((r) => r[index]).cast<T>();
+  }
+
+  void columnToInt(/* String | int */ index) {
+    index = _toIndex(index);
+
+    for (int r = 0; r < rows.length; r++) {
+      rows[r][index] = ColumnConverter.toInt(rows[r][index]);
+    }
+  }
+
+  void columnToDouble(/* String | int */ index) {
+    index = _toIndex(index);
+
+    for (int r = 0; r < rows.length; r++) {
+      rows[r][index] = ColumnConverter.toDouble(rows[r][index]);
+    }
+  }
+
+  void columnToNum(/* String | int */ index) {
+    index = _toIndex(index);
+
+    for (int r = 0; r < rows.length; r++) {
+      rows[r][index] = ColumnConverter.toNum(rows[r][index]);
+    }
+  }
+
+  void columnToBool(/* String | int */ index,
+      {List<String> trues = const ['true', 'True'],
+      List<String> falses = const ['false', 'False']}) {
+    index = _toIndex(index);
+
+    for (int r = 0; r < rows.length; r++) {
+      rows[r][index] =
+          ColumnConverter.toBool(rows[r][index], trues: trues, falses: falses);
+    }
+  }
+
+  void columnToDateTime(/* String | int */ index,
+      {String format = ColumnConverter.defDateTimeFormat,
+      String locale,
+      bool isUtc = false}) {
+    index = _toIndex(index);
+
+    for (int r = 0; r < rows.length; r++) {
+      rows[r][index] = ColumnConverter.toDateTime(rows[r][index],
+          format: format, locale: locale, isUtc: isUtc);
+    }
   }
 
   Iterable<int> columnAsInt(/* String | int */ index) {
