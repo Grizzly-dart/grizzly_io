@@ -2,14 +2,16 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'package:grizzly_io/grizzly_io.dart';
-import 'package:grizzly_io/src/csv/parser/parser.dart';
+// import 'package:grizzly_io/src/csv/parser/parser.dart';
+import 'package:grizzly_io/io_loader.dart';
 
-main() {
+Future<void> main() async {
   /*
   String fs = r',';
   String ts = r"'";
 
-  String input = "Name,Age',''House'";
+  String input = """Name,Age,'House
+  (H)'""";
 
   List<String> cols = CsvParser.parseRow(input, fs: fs, ts: ts);
 
@@ -19,4 +21,13 @@ main() {
     cols.forEach(print);
   }
   */
+  Table tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
+  print(tsv);
+  final out = encodeCsv(tsv.toList(), fieldSep: '\t');
+  print(out);
+  tsv = parseLTsv(out);
+  print(tsv);
+
+  print(tsv.columnAsInt("Age"));
+  print(tsv.toMap());
 }

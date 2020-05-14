@@ -9,4 +9,5 @@ pubspec.lock
 doc/api/
 
 .idea
-grizzly_io.iml
+*.iml
+.dart_tool

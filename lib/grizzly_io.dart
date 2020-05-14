@@ -4,6 +4,7 @@
 /// Readers and writers for several file formats (CSV, TSV, JSON, YAML, etc)
 library grizzly.io;
 
-export 'src/base.dart';
+export 'src/csv/writer.dart';
+export 'src/csv/parser/parser.dart';
 export 'src/tsv/tsv.dart';
 export 'src/type_converter/type_converter.dart';

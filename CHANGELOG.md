@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.2.0
+
++ Combined `Rows` and `Columns` into `Table`
+
+## 2.1.0
+
++ Renamed `LabledTable` to `Table`
+
+## 2.2.1
+
++ Fixed RangeError exception in Table.toMap()
+
+## 2.0.1
+
++ Analyzer warning fixes
+
+## 2.0.0
+
++ Dart 2.0.0 support
+
+## 1.2.2
+
++ Bug fix: `TypeConverter.toNum`
+
+## 1.2.1
+
++ Breaking changes to `LabeledTsv`
+
 ## 0.0.4
 
 - Replaced `LabeledTsv` with `parseLabTsv` and `toLabTsv`

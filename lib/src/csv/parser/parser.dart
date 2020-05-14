@@ -1,17 +1,25 @@
 /// Provides [CsvParser] class to parse CSV-like file formats
 ///
-/// [csvParser] convenience function creates a [CsvParser] with given settings
+/// [parseCsv] and [parseLCsv]  are convenience function to parse CSV
+/// and labeled CSV respectively.
 ///
 /// Static method [CsvParser.parseRow] can be used parse a single row.
 library grizzly.io.csv.parser;
 
 import 'dart:convert';
+import 'package:grizzly_io/src/type_converter/type_converter.dart' show Table;
 
-/// Creates a CSV parser with given field separator [fieldSep], text separator
-/// [textSep] and multiline [multiline]
-CsvParser csvParser(
-        {String fieldSep: ',', String textSep: '"', bool multiline: true}) =>
-    new CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline);
+/// Parses the given CSV buffer
+List<List<String>> parseCsv(String buffer,
+        {String fieldSep = ',', String textSep = '"', bool multiline = true}) =>
+    CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
+        .convert(buffer);
+
+/// Parses the given labeled CSV buffer
+Table parseLCsv(String buffer,
+        {String fieldSep = ',', String textSep = '"', bool multiline = true}) =>
+    CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
+        .convertLabeled(buffer);
 
 /// Parser of CSV-like file formats
 class CsvParser {
@@ -29,7 +37,9 @@ class CsvParser {
   final bool multiline;
 
   const CsvParser(
-      {this.fieldSep: ',', this.textSep: '"', this.multiline: true});
+      {this.fieldSep = ',', this.textSep = '"', this.multiline = true});
+
+  Table convertLabeled(String csv) => Table.from(convert(csv), hasHeader: true);
 
   /// Parses single CSV row [csv]
   ///
@@ -41,7 +51,7 @@ class CsvParser {
   List<String> convertRow(String csv) =>
       parseRow(csv, fs: fieldSep, ts: textSep);
 
-  List<List> convert(String buffer, {bool multiline: true}) {
+  List<List<String>> convert(String buffer, {bool multiline = true}) {
     final Iterable<String> lines = LineSplitter.split(buffer).toList();
 
     return convertLines(lines, multiline: multiline);
@@ -50,24 +60,26 @@ class CsvParser {
   /// Parses given CSV [lines]
   ///
   /// [multiline] can be used to control if a single row can span multiple lines
-  List<List> convertLines(Iterable<String> lines, {bool multiline: true}) {
+  List<List<String>> convertLines(Iterable<String> lines,
+      {bool multiline = true}) {
     final bool m = multiline ?? this.multiline ?? true;
 
-    final List<List> ret = [];
+    final List<List<String>> ret = [];
 
     String previousLine;
     for (String line in lines) {
       if (previousLine == null) {
-        final List row = parseRow(line, fs: fieldSep, ts: textSep);
+        final List<String> row = parseRow(line, fs: fieldSep, ts: textSep);
         if (row != null) {
           ret.add(row);
         } else {
-          if (!m) throw new Exception('Invalid row!');
+          if (!m) throw Exception('Invalid row!');
           previousLine = line;
         }
       } else {
         previousLine = previousLine + '\r\n' + line;
-        final List row = parseRow(previousLine, fs: fieldSep, ts: textSep);
+        final List<String> row =
+            parseRow(previousLine, fs: fieldSep, ts: textSep);
         if (row != null) {
           ret.add(row);
           previousLine = null;
@@ -87,14 +99,14 @@ class CsvParser {
   ///
   ///     CsvParser.parse('Name,'Age',House');  // => [Name, Age, House]
   static List<String> parseRow(String input,
-      {String fs: r',', String ts: r'"'}) {
+      {String fs = r',', String ts = r'"'}) {
     final RegExp regExp1 =
-        new RegExp('([^$ts$fs]+)' + r'(?:' + fs + r'|$)', multiLine: true);
-    final RegExp regExp2 = new RegExp(
-        '$ts((?:$ts{2}|[^$ts])*)$ts' + r'(?:' + fs + r'|$)',
+        RegExp('([^$ts$fs]+)' r'(?:' + fs + r'|$)', multiLine: true);
+    final RegExp regExp2 = RegExp(
+        '$ts((?:$ts{2}|[^$ts])*)$ts' r'(?:' + fs + r'|$)',
         multiLine: true);
-    final RegExp fsRegExp = new RegExp(fs);
-    final RegExp tsRegExp = new RegExp(ts);
+    final RegExp fsRegExp = RegExp(fs);
+    final RegExp tsRegExp = RegExp(ts);
 
     final List<String> columns = [];
 
@@ -129,7 +141,7 @@ class CsvParser {
 
       if (!found) {
         if (input.startsWith(tsRegExp)) return null;
-        throw new Exception('Invalid row!');
+        throw Exception('Invalid row!');
       }
     }
 
