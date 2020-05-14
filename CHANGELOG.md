@@ -8,6 +8,10 @@
 
 + Renamed `LabledTable` to `Table`
 
+## 2.2.1
+
++ Fixed RangeError exception in Table.toMap()
+
 ## 2.0.1
 
 + Analyzer warning fixes

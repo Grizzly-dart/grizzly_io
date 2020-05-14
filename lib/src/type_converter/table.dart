@@ -40,7 +40,7 @@ class Table {
     final ret = <String, dynamic>{};
 
     for (int i = 0; i < header.length; i++) {
-      ret[header[i]] = row[i];
+      ret[header[i]] = i < row.length? row[i]: null;
     }
 
     return ret;
