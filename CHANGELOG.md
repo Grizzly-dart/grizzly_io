@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.2
+
++ Updated homepage
+
+## 2.2.1
+
++ Fixed RangeError exception in Table.toMap()
+
 ## 2.2.0
 
 + Combined `Rows` and `Columns` into `Table`
@@ -7,10 +15,6 @@
 ## 2.1.0
 
 + Renamed `LabledTable` to `Table`
-
-## 2.2.1
-
-+ Fixed RangeError exception in Table.toMap()
 
 ## 2.0.1
 
