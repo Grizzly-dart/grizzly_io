@@ -20,7 +20,7 @@ Future<Table> requestLCsv(String url,
     bool multiline = true,
     int headerRow = 0}) async {
   final client = Client();
-  final Response resp = await client.get(url);
+  final Response resp = await client.get(Uri.parse(url));
   return parseLCsv(resp.body,
       fieldSep: fieldSep, textSep: textSep, multiline: multiline);
 }
@@ -31,7 +31,7 @@ Future<List<List<String>>> requestCsv(String url,
     String textSep = '"',
     bool multiline = true}) async {
   final client = Client();
-  final Response resp = await client.get(url);
+  final Response resp = await client.get(Uri.parse(url));
   return parseCsv(resp.body,
       fieldSep: fieldSep, textSep: textSep, multiline: multiline);
 }
@@ -39,7 +39,7 @@ Future<List<List<String>>> requestCsv(String url,
 /// Downloads the TSV file from specified [url] and returns the parsed data
 Future<Table> requestLTsv(String url) async {
   final client = Client();
-  final Response resp = await client.get(url);
+  final Response resp = await client.get(Uri.parse(url));
   return parseLTsv(resp.body);
 }
 
