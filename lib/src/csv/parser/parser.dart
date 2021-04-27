@@ -48,8 +48,15 @@ class CsvParser {
   /// Throws if the row is invalid!
   ///
   ///     parser.convertRow('Name,'Age',House');  // => [Name, Age, House]
-  List<String> convertRow(String csv) =>
-      parseRow(csv, fs: fieldSep, ts: textSep);
+  List<String>? convertRow(String csv) {
+    final ret = parseRow(csv, fs: fieldSep, ts: textSep);
+
+    if (ret == null) {
+      throw Exception('invalid row');
+    }
+
+    return ret;
+  }
 
   List<List<String>> convert(String buffer, {bool multiline = true}) {
     final Iterable<String> lines = LineSplitter.split(buffer).toList();
@@ -60,25 +67,26 @@ class CsvParser {
   /// Parses given CSV [lines]
   ///
   /// [multiline] can be used to control if a single row can span multiple lines
-  List<List<String>> convertLines(Iterable<String> lines,
-      {bool multiline = true}) {
-    final bool m = multiline ?? this.multiline ?? true;
+  List<List<String>> convertLines(Iterable<String> lines, {bool? multiline}) {
+    final bool isMultiline = multiline ?? this.multiline;
 
     final List<List<String>> ret = [];
 
-    String previousLine;
+    String? previousLine;
     for (String line in lines) {
       if (previousLine == null) {
-        final List<String> row = parseRow(line, fs: fieldSep, ts: textSep);
+        final List<String>? row = parseRow(line, fs: fieldSep, ts: textSep);
         if (row != null) {
           ret.add(row);
         } else {
-          if (!m) throw Exception('Invalid row!');
+          if (!isMultiline) {
+            throw Exception('Invalid row!');
+          }
           previousLine = line;
         }
       } else {
         previousLine = previousLine + '\r\n' + line;
-        final List<String> row =
+        final List<String>? row =
             parseRow(previousLine, fs: fieldSep, ts: textSep);
         if (row != null) {
           ret.add(row);
@@ -97,12 +105,12 @@ class CsvParser {
   ///
   /// Throws if the row is invalid!
   ///
-  ///     CsvParser.parse('Name,'Age',House');  // => [Name, Age, House]
-  static List<String> parseRow(String input,
+  ///     CsvParser.parse("Name,'Age',House");  // => [Name, Age, House]
+  static List<String>? parseRow(String input,
       {String fs = r',', String ts = r'"'}) {
-    final RegExp regExp1 =
+    final RegExp fieldWithoutTS =
         RegExp('([^$ts$fs]+)' r'(?:' + fs + r'|$)', multiLine: true);
-    final RegExp regExp2 = RegExp(
+    final RegExp fieldWithTS = RegExp(
         '$ts((?:$ts{2}|[^$ts])*)$ts' r'(?:' + fs + r'|$)',
         multiLine: true);
     final RegExp fsRegExp = RegExp(fs);
@@ -111,38 +119,47 @@ class CsvParser {
     final List<String> columns = [];
 
     while (input.isNotEmpty) {
-      bool found = false;
-      {
-        if (input.startsWith(fsRegExp)) {
-          Match match = fsRegExp.firstMatch(input);
-          if (match != null) {
-            found = true;
-            columns.add(null);
-            input = input.substring(match.end);
-          }
-        }
-      }
-      if (!found && input.startsWith(regExp1)) {
-        Match match = regExp1.firstMatch(input);
+      // Empty column
+      if (input.startsWith(fsRegExp)) {
+        Match? match = fsRegExp.firstMatch(input);
         if (match != null) {
-          found = true;
-          columns.add(match.group(1));
+          columns.add('');
           input = input.substring(match.end);
+        } else {
+          throw Exception('unknown error');
         }
-      }
-      if (!found && input.startsWith(regExp2)) {
-        Match match = regExp2.firstMatch(input);
-        if (match != null) {
-          found = true;
-          columns.add(match.group(1));
-          input = input.substring(match.end);
-        }
+        continue;
       }
 
-      if (!found) {
-        if (input.startsWith(tsRegExp)) return null;
-        throw Exception('Invalid row!');
+      // Single/Multi line column without text separator
+      if (input.startsWith(fieldWithoutTS)) {
+        Match? match = fieldWithoutTS.firstMatch(input);
+        if (match != null) {
+          columns.add(match.group(1)!);
+          input = input.substring(match.end);
+        } else {
+          throw Exception('unknown error');
+        }
+        continue;
       }
+
+      // Single/Multi line column with text separator
+      if (input.startsWith(fieldWithTS)) {
+        Match? match = fieldWithTS.firstMatch(input);
+        if (match != null) {
+          columns.add(match.group(1)!);
+          input = input.substring(match.end);
+        } else {
+          throw Exception('unknown error');
+        }
+        continue;
+      }
+
+      if (input.startsWith(tsRegExp)) {
+        return null;
+      }
+
+      throw Exception('Invalid row!');
     }
 
     return columns;

@@ -10,12 +10,12 @@ class Table {
 
   Table(this.header, this.rows);
 
-  factory Table.from(List<List<String>> data, {bool hasHeader = false}) {
+  factory Table.from(List<List<String?>> data, {bool hasHeader = false}) {
     if (data.isEmpty) return Table(<String>[], <List>[]);
     List<String> header;
     List<List> rows = data;
     if (hasHeader) {
-      header = data.first;
+      header = data.first.cast<String>();
       rows = rows.skip(1).toList();
     } else {
       header = <String>[]..length = data.first.length;
@@ -40,7 +40,7 @@ class Table {
     final ret = <String, dynamic>{};
 
     for (int i = 0; i < header.length; i++) {
-      ret[header[i]] = i < row.length? row[i]: null;
+      ret[header[i]] = i < row.length ? row[i] : null;
     }
 
     return ret;
@@ -71,92 +71,92 @@ class Table {
     return rows.map((r) => r[index]).cast<T>();
   }
 
-  void columnToInt(/* String | int */ index) {
+  void columnToInt(/* String | int */ index, {int? defaultValue}) {
     index = _toIndex(index);
 
     for (int r = 0; r < rows.length; r++) {
-      rows[r][index] = ColumnConverter.toInt(rows[r][index]);
+      rows[r][index] =
+          ColumnConverter.toInt(rows[r][index], defaultValue: defaultValue);
     }
   }
 
-  void columnToDouble(/* String | int */ index) {
+  void columnToDouble(/* String | int */ index, {double? defaultValue}) {
     index = _toIndex(index);
 
     for (int r = 0; r < rows.length; r++) {
-      rows[r][index] = ColumnConverter.toDouble(rows[r][index]);
+      rows[r][index] =
+          ColumnConverter.toDouble(rows[r][index], defaultValue: defaultValue);
     }
   }
 
-  void columnToNum(/* String | int */ index) {
+  void columnToNum(/* String | int */ index, {num? defaultValue}) {
     index = _toIndex(index);
 
     for (int r = 0; r < rows.length; r++) {
-      rows[r][index] = ColumnConverter.toNum(rows[r][index]);
+      rows[r][index] =
+          ColumnConverter.toNum(rows[r][index], defaultValue: defaultValue);
     }
   }
 
   void columnToBool(/* String | int */ index,
       {List<String> trues = const ['true', 'True'],
-      List<String> falses = const ['false', 'False']}) {
+      List<String> falses = const ['false', 'False'],
+      bool? defaultValue}) {
     index = _toIndex(index);
 
     for (int r = 0; r < rows.length; r++) {
-      rows[r][index] =
-          ColumnConverter.toBool(rows[r][index], trues: trues, falses: falses);
+      rows[r][index] = ColumnConverter.toBool(rows[r][index],
+          trues: trues, falses: falses, defaultValue: defaultValue);
     }
   }
 
   void columnToDateTime(/* String | int */ index,
       {String format = ColumnConverter.defDateTimeFormat,
-      String locale,
-      bool isUtc = false}) {
+      String? locale,
+      bool isUtc = false,
+      DateTime? defaultValue}) {
     index = _toIndex(index);
 
     for (int r = 0; r < rows.length; r++) {
       rows[r][index] = ColumnConverter.toDateTime(rows[r][index],
-          format: format, locale: locale, isUtc: isUtc);
+          format: format,
+          locale: locale,
+          isUtc: isUtc,
+          defaultValue: defaultValue);
     }
   }
 
-  Iterable<int> columnAsInt(/* String | int */ index) {
+  Iterable<int?> columnAsInt(/* String | int */ index, {int? defaultValue}) {
     final input = column(index);
-    if (input == null) return null;
-    if (!ColumnConverter.isInts(input)) return null;
-    return ColumnConverter.toInts(input);
+    return ColumnConverter.toInts(input, defaultValue: defaultValue);
   }
 
-  Iterable<double> columnAsDouble(/* String | int */ index) {
+  Iterable<double?> columnAsDouble(/* String | int */ index,
+      {double? defaultValue}) {
     final input = column(index);
-    if (input == null) return null;
-    if (!ColumnConverter.isDoubles(input)) return null;
-    return ColumnConverter.toDoubles(input);
+    return ColumnConverter.toDoubles(input, defaultValue: defaultValue);
   }
 
-  Iterable<num> columnAsNum(/* String | int */ index) {
+  Iterable<num?> columnAsNum(/* String | int */ index, {num? defaultValue}) {
     final input = column(index);
-    if (input == null) return null;
-    if (!ColumnConverter.isNums(input)) return null;
-    return ColumnConverter.toNums(input);
+    return ColumnConverter.toNums(input, defaultValue: defaultValue);
   }
 
-  Iterable<bool> columnAsBool(/* String | int */ index,
+  Iterable<bool?> columnAsBool(/* String | int */ index,
       {List<String> trues = const ['true', 'True'],
-      List<String> falses = const ['false', 'False']}) {
+      List<String> falses = const ['false', 'False'],
+      bool? defaultValue}) {
     final input = column(index);
-    if (input == null) return null;
-    if (!ColumnConverter.isBools(input, trues: trues, falses: falses))
-      return null;
-    return ColumnConverter.toBools(input, trues: trues, falses: falses);
+    return ColumnConverter.toBools(input,
+        trues: trues, falses: falses, defaultValue: defaultValue);
   }
 
-  Iterable<DateTime> columnAsDateTime(/* String | int */ index,
+  Iterable<DateTime?> columnAsDateTime(/* String | int */ index,
       {String format = ColumnConverter.defDateTimeFormat,
-      String locale,
-      bool isUtc = false}) {
+      String? locale,
+      bool isUtc = false,
+      DateTime? defaultValue}) {
     final input = column(index);
-    if (input == null) return null;
-    if (!ColumnConverter.isDateTimes(input,
-        format: format, locale: locale, isUtc: isUtc)) return null;
-    return ColumnConverter.toDateTimes(input);
+    return ColumnConverter.toDateTimes(input, defaultValue: defaultValue);
   }
 }

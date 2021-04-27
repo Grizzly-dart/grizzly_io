@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0
+
++ Null safety
+
 ## 2.2.0
 
 + Combined `Rows` and `Columns` into `Table`

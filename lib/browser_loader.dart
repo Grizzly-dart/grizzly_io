@@ -54,5 +54,5 @@ Future<Table> readLTsv(Blob file, {Encoding encoding = utf8}) async {
   if (reader.result is! String) {
     throw Exception('Could not read File/Blob!');
   }
-  return parseLTsv(reader.result);
+  return parseLTsv(reader.result as String);
 }

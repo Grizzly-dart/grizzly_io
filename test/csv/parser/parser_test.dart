@@ -10,67 +10,67 @@ void main() {
 
     test('Normal', () {
       final String input = "Name,Age,House";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
       expect(cols, ['Name', 'Age', 'House']);
     });
 
     test('Empty', () {
       final String input = "Name,,Age,House";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
-      expect(cols, ['Name', null, 'Age', 'House']);
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
+      expect(cols, ['Name', '', 'Age', 'House']);
     });
 
     test('TextSep', () {
       final String input = "Name,'Age',House";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
       expect(cols, ['Name', 'Age', 'House']);
     });
 
     test('Empty in TextSep', () {
       final String input = "Name,'','Age',House";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
       expect(cols, ['Name', '', 'Age', 'House']);
     });
 
     test('TextSep.Last', () {
       final String input = "Name,,'Age','House'";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
-      expect(cols, ['Name', null, 'Age', 'House']);
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
+      expect(cols, ['Name', '', 'Age', 'House']);
     });
 
     test('TextSep in text', () {
       final String input = "Name,,'''a''Age''','House'";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
-      expect(cols, ['Name', null, "''a''Age''", 'House']);
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
+      expect(cols, ['Name', '', "''a''Age''", 'House']);
     });
 
     test('FieldSep in text', () {
       final String input = "Name,,'''Age'',''','House'";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
-      expect(cols, ['Name', null, "''Age'',''", 'House']);
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
+      expect(cols, ['Name', '', "''Age'',''", 'House']);
     });
 
     test('Muliline', () {
       final String input = "Name,,'''Age'',''','House\r\nh'";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
-      expect(cols, ['Name', null, "''Age'',''", "House\r\nh"]);
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
+      expect(cols, ['Name', '', "''Age'',''", "House\r\nh"]);
     });
 
     test('Multiline.TextSepTextInLineEnd', () {
       final String input = "Name,,'Age','House''\r\nh'";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
-      expect(cols, ['Name', null, "Age", "House''\r\nh"]);
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
+      expect(cols, ['Name', '', "Age", "House''\r\nh"]);
     });
 
     test('Multiline.Incomplete', () {
       final String input = "Name,,'Age','House";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
       expect(cols, null);
     });
 
     test('Multiline.Incomplete.TextSepTextInEnd', () {
       final String input = "Name,,'Age','House''";
-      List<String> cols = CsvParser.parseRow(input, ts: r"'");
+      List<String>? cols = CsvParser.parseRow(input, ts: r"'");
       expect(cols, null);
     });
 
