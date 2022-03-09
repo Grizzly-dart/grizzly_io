@@ -23,11 +23,11 @@ class Table {
     return Table(header, rows);
   }
 
-  bool get hasHeader => header.any((h) => h != null);
+  // bool get hasHeader => header.any((h) => h != null);
 
   List<List> toList() {
     final list = <List>[];
-    if (hasHeader) list.add(header);
+    list.add(header);
     list.addAll(rows);
     return list;
   }

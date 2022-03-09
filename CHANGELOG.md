@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
++ Updated homepage in pubspec
+
 ## 3.0.0
 
 + Null safety

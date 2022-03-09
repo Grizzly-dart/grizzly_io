@@ -1,6 +1,5 @@
 library grizzly.io.tsv;
 
-import '../csv/parser/parser.dart';
 import 'package:grizzly_io/grizzly_io.dart';
 
 const CsvParser tsvParser = CsvParser(fieldSep: '\t');
