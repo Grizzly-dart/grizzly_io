@@ -18,8 +18,7 @@ export 'package:grizzly_io/grizzly_io.dart';
 Future<Table> requestLCsv(String url,
     {String fieldSep = ',',
     String textSep = '"',
-    bool multiline = true,
-    int headerRow = 0}) async {
+    bool multiline = true}) async {
   final client = BrowserClient();
   final Response resp = await client.get(Uri.parse(url));
   return parseLCsv(resp.body,

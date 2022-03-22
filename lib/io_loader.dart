@@ -17,8 +17,7 @@ export 'package:grizzly_io/grizzly_io.dart';
 Future<Table> requestLCsv(String url,
     {String fieldSep = ',',
     String textSep = '"',
-    bool multiline = true,
-    int headerRow = 0}) async {
+    bool multiline = true}) async {
   final client = Client();
   final Response resp = await client.get(Uri.parse(url));
   return parseLCsv(resp.body,
@@ -48,8 +47,7 @@ Future<List<List<String>>> readCsv(String path,
     {Encoding encoding = utf8,
     String fieldSep = ',',
     String textSep = '"',
-    bool multiline = true,
-    int headerRow = 0}) async {
+    bool multiline = true}) async {
   final File file = File(path);
   if (!await file.exists()) throw Exception('File not found!');
   return parseCsv(await file.readAsString(encoding: encoding),
@@ -61,8 +59,7 @@ Future<Table> readLCsv(String path,
     {Encoding encoding = utf8,
     String fieldSep = ',',
     String textSep = '"',
-    bool multiline = true,
-    int headerRow = 0}) async {
+    bool multiline = true}) async {
   final File file = File(path);
   if (!await file.exists()) throw Exception('File not found!');
   return parseLCsv(await file.readAsString(encoding: encoding),
