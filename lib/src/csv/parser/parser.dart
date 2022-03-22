@@ -98,6 +98,8 @@ class CsvParser {
     return ret;
   }
 
+  // TODO(tejag): streaming parser
+
   /// Parses single CSV row [input] with field separator [fs] and text separator
   /// [ts]
   ///

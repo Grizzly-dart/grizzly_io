@@ -4,7 +4,7 @@ import 'package:grizzly_io/grizzly_io.dart';
 import 'type_converter.dart';
 
 class Table {
-  final List<String> header;
+  final List<String>? header;
 
   final List<List> rows;
 
@@ -27,7 +27,7 @@ class Table {
 
   List<List> toList() {
     final list = <List>[];
-    list.add(header);
+    if(header != null) list.add(header!);
     list.addAll(rows);
     return list;
   }
@@ -35,12 +35,15 @@ class Table {
   String toString() => toList().toString();
 
   Map<String, dynamic> rowToMap(int index) {
+    if(header == null) {
+      throw Exception('This table does not have a header!');
+    }
     final row = rows[index];
 
     final ret = <String, dynamic>{};
 
-    for (int i = 0; i < header.length; i++) {
-      ret[header[i]] = i < row.length ? row[i] : null;
+    for (int i = 0; i < header!.length; i++) {
+      ret[header![i]] = i < row.length ? row[i] : null;
     }
 
     return ret;
@@ -60,7 +63,10 @@ class Table {
 
   int _toIndex(/* String | int */ index) {
     if (index is String) {
-      index = header.indexOf(index);
+      if(header == null) {
+        throw Exception('indexing by column name is not allowed when table does not have a header!');
+      }
+      index = header!.indexOf(index);
       if (index == -1) throw Exception("columns $index does not exist");
     }
     return index;
