@@ -9,84 +9,6 @@ export 'table.dart';
 class ColumnConverter {
   static const String defDateTimeFormat = 'yyyy-MM-dd';
 
-  static bool isInt(v) {
-    if (v == null) return true;
-    if (v is num) return true;
-    if (v is String) return int.tryParse(v) != null;
-    return false;
-  }
-
-  static int? toInt(v, {int? defaultValue}) {
-    if (v == null) return defaultValue;
-    if (v is int) return v;
-    if (v is num) return v.toInt();
-    if (v is String) return int.tryParse(v) ?? defaultValue;
-    if (defaultValue != null) return defaultValue;
-    throw Exception('Trying to convert a non-integer to int!');
-  }
-
-  static bool isDouble(v) {
-    if (v == null) return true;
-    if (v is num) return true;
-    if (v is String) return double.tryParse(v) != null;
-    return false;
-  }
-
-  static double? toDouble(v, {double? defaultValue}) {
-    if (v == null) return defaultValue;
-    if (v is double) return v;
-    if (v is num) return v.toDouble();
-    if (v is String) return double.tryParse(v) ?? defaultValue;
-    if (defaultValue != null) return defaultValue;
-    throw Exception('Trying to convert a non-double to double!');
-  }
-
-  static bool isNum(v) {
-    if (v == null) return true;
-    if (v is num) return true;
-    if (v is String) return num.tryParse(v) != null;
-    return false;
-  }
-
-  static num? toNum(v, {num? defaultValue}) {
-    if (v == null) return defaultValue;
-    if (v is num) return v;
-    if (v is String) return num.tryParse(v) ?? defaultValue;
-    if (defaultValue != null) return defaultValue;
-    throw Exception('Trying to convert a non-num to num!');
-  }
-
-  static bool isBool(v,
-      {List<String> trues = const ['true', 'True'],
-      List<String> falses = const ['false', 'False']}) {
-    if (v == null) return true;
-    if (v is bool) return true;
-    if (v is num) return true;
-    if (v is String) {
-      if (trues.contains(v)) return true;
-      if (falses.contains(v)) return true;
-      return false;
-    }
-    return false;
-  }
-
-  static bool? toBool(v,
-      {List<String> trues = const ['true', 'True'],
-      List<String> falses = const ['false', 'False'],
-      bool? defaultValue}) {
-    if (v == null) return defaultValue;
-    if (v is bool) return v;
-    if (v is num) return v != 0;
-    if (v is String) {
-      if (trues.contains(v)) return true;
-      if (falses.contains(v)) return false;
-      if (defaultValue != null) return defaultValue;
-      throw Exception('Trying to convert a non-bool to bool!');
-    }
-    if (defaultValue != null) return defaultValue;
-    throw Exception('Trying to convert a non-bool to bool!');
-  }
-
   static bool isDateTime(v,
       {String format = defDateTimeFormat, String? locale, bool isUtc = false}) {
     if (v == null) return true;
@@ -130,12 +52,6 @@ class ColumnConverter {
     if (defaultValue != null) return defaultValue;
     throw Exception('Trying to convert a non-DateTime to DateTime!');
   }
-
-  /// Checks that if `List` [list] can be a `List<int>`
-  static bool isInts(Iterable list) => list.every(isInt);
-
-  static Iterable<int?> toInts(Iterable list, {int? defaultValue}) =>
-      list.map((v) => toInt(v, defaultValue: defaultValue));
 
   /// Checks that if `List` [list] can be a `List<double>`
   static bool isDoubles(Iterable list) => list.every(isDouble);
@@ -182,4 +98,152 @@ class ColumnConverter {
 
   static Iterable<String?> toStrings(Iterable list, {String? defaultValue}) =>
       list.map((v) => v?.toString() ?? defaultValue);
+}
+
+extension ConvExt on Object {
+  bool canToInt() {
+    if (this is int) {
+      return true;
+    } else if (this is num) {
+      return true;
+    } else if (this is String) {
+      return int.tryParse(this as String) != null;
+    }
+
+    return false;
+  }
+
+  bool canToDouble() {
+    if (this is double) {
+      return true;
+    } else if (this is num) {
+      return true;
+    } else if (this is String) {
+      return double.tryParse(this as String) != null;
+    }
+
+    return false;
+  }
+
+  bool canToNum() {
+    if (this is num) {
+      return true;
+    } else if (this is String) {
+      return num.tryParse(this as String) != null;
+    }
+
+    return false;
+  }
+
+  bool canToBool(
+      {List<String> trues = const ['true', 'True'],
+      List<String> falses = const ['false', 'False']}) {
+    if (this is bool) return true;
+    if (this is num) return true;
+    if (this is String) {
+      if (trues.contains(this)) return true;
+      if (falses.contains(this)) return true;
+      return false;
+    }
+    return false;
+  }
+
+  int? asInt({int? defaultValue}) {
+    if (this is int) {
+      return this as int;
+    } else if (this is num) {
+      return (this as num).toInt();
+    } else if (this is String) {
+      return int.parse(this as String);
+    }
+
+    return defaultValue;
+  }
+
+  double? asDouble({double? defaultValue}) {
+    if (this is double) {
+      return this as double;
+    } else if (this is num) {
+      return (this as num).toDouble();
+    } else if (this is String) {
+      return double.parse(this as String);
+    }
+
+    return defaultValue;
+  }
+
+  num? asNum({num? defaultValue}) {
+    if (this is num) {
+      return this as num;
+    } else if (this is String) {
+      return num.parse(this as String);
+    }
+
+    return defaultValue;
+  }
+
+  bool? asBool(
+      {List<String> trues = const ['true', 'True'],
+      List<String> falses = const ['false', 'False'],
+      bool? defaultValue}) {
+    if (this is bool) return this as bool;
+    if (this is num) return this != 0;
+    if (this is String) {
+      if (trues.contains(this)) return true;
+      if (falses.contains(this)) return false;
+      return defaultValue;
+    }
+    return defaultValue;
+  }
+}
+
+extension NullableIterableConvExt<T> on Iterable<T?> {
+  /// Checks that if `Iterable` [iterable] can be a `Iterable<int>`
+  bool get canToInts => every((v) => v?.canToInt() ?? true);
+
+  Iterable<int?> toInts({int? defaultValue}) =>
+      map((v) => v?.asInt(defaultValue: defaultValue));
+
+  bool get canToDoubles => every((v) => v?.canToDouble() ?? true);
+
+  Iterable<double?> toDoubles({double? defaultValue}) =>
+      map((v) => v?.asDouble(defaultValue: defaultValue));
+
+  bool get canToNums => every((v) => v?.canToNum() ?? true);
+
+  Iterable<num?> toNums({num? defaultValue}) =>
+      map((v) => v?.asNum(defaultValue: defaultValue));
+}
+
+extension IterableConvExt<T extends Object> on Iterable<T> {
+  /// Checks that if `Iterable` [iterable] can be a `Iterable<int>`
+  bool get canToInts => every((v) => v.canToInt());
+
+  Iterable<int> toInts({int? defaultValue}) => map((v) {
+        final ret = v.asInt(defaultValue: defaultValue);
+        if (ret == null) {
+          throw Exception('Cannot convert ${v.runtimeType} to int');
+        }
+        return ret;
+      });
+
+  bool get canToDoubles => every((v) => v.canToDouble());
+
+  Iterable<double> toDoubles({double? defaultValue}) => map((v) {
+        final ret = v.asDouble(defaultValue: defaultValue);
+        if (ret == null) {
+          throw Exception('Cannot convert ${v.runtimeType} to double');
+        }
+        return ret;
+      });
+
+  bool get canToNums => every((v) => v.canToNum());
+
+  Iterable<num> toNums({num? defaultValue}) => map((v) {
+        final ret = v.asNum(defaultValue: defaultValue);
+        if (ret == null) {
+          throw Exception('Cannot convert ${v.runtimeType} to num');
+        }
+        return ret;
+      });
 }
