@@ -22,11 +22,11 @@ Future<void> main() async {
   */
   Table tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
   print(tsv);
-  final out = encodeCsv(tsv.toList(), fieldSep: '\t');
+  final out = encodeCsv(tsv.toListWithHeader(), fieldSep: '\t');
   print(out);
   tsv = parseLTsv(out);
   print(tsv);
 
-  print(tsv.columnAsInt("Age"));
+  print(tsv.column("Age").asInt());
   print(tsv.toMap());
 }

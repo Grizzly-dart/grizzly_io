@@ -5,100 +5,9 @@ import 'package:intl/intl.dart';
 
 export 'table.dart';
 
-/// Utility functions to convert dynamic columns in tables to typed columns
-class ColumnConverter {
-  static const String defDateTimeFormat = 'yyyy-MM-dd';
-
-  static bool isDateTime(v,
-      {String format = defDateTimeFormat, String? locale, bool isUtc = false}) {
-    if (v == null) return true;
-    if (v is num) return true;
-    if (v is DateTime) return true;
-    if (v is String) {
-      final num? n = num.tryParse(v);
-      if (n != null) return true;
-
-      final df = DateFormat(format, locale);
-      try {
-        df.parse(v, isUtc);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }
-    return false;
-  }
-
-  static DateTime? toDateTime(v,
-      {String format = defDateTimeFormat,
-      String? locale,
-      bool isUtc = false,
-      DateTime? defaultValue}) {
-    if (v == null) return defaultValue;
-    if (v is num) return DateTime.fromMillisecondsSinceEpoch(v.toInt());
-    if (v is DateTime) return v;
-    if (v is String) {
-      final num? n = num.tryParse(v);
-      if (n != null) DateTime.fromMillisecondsSinceEpoch(n.toInt());
-
-      final df = DateFormat(format, locale);
-      try {
-        return df.parse(v, isUtc);
-      } catch (e) {
-        if (defaultValue != null) return defaultValue;
-        throw Exception('Trying to convert a non-DateTime to DateTime!');
-      }
-    }
-    if (defaultValue != null) return defaultValue;
-    throw Exception('Trying to convert a non-DateTime to DateTime!');
-  }
-
-  /// Checks that if `List` [list] can be a `List<double>`
-  static bool isDoubles(Iterable list) => list.every(isDouble);
-
-  static Iterable<double?> toDoubles(Iterable list, {double? defaultValue}) =>
-      list.map((v) => toDouble(v, defaultValue: defaultValue));
-
-  /// Checks that if `List` [list] can be a `List<num>`
-  static bool isNums(Iterable list) => list.every(isNum);
-
-  static Iterable<num?> toNums(Iterable list, {num? defaultValue}) =>
-      list.map((v) => toNum(v, defaultValue: defaultValue));
-
-  /// Checks that if `List` [list] can be a `List<bool>`
-  static bool isBools(Iterable list,
-          {List<String> trues = const ['true', 'True'],
-          List<String> falses = const ['false', 'False']}) =>
-      list.every((e) => isBool(e, trues: trues, falses: falses));
-
-  static Iterable<bool?> toBools(Iterable list,
-          {List<String> trues = const ['true', 'True'],
-          List<String> falses = const ['false', 'False'],
-          bool? defaultValue}) =>
-      list.map((e) =>
-          toBool(e, trues: trues, falses: falses, defaultValue: defaultValue));
-
-  static bool isDateTimes(Iterable list,
-          {String format = defDateTimeFormat,
-          String? locale,
-          bool isUtc = false}) =>
-      list.every(
-          (v) => isDateTime(v, format: format, locale: locale, isUtc: isUtc));
-
-  static Iterable<DateTime?> toDateTimes(Iterable list,
-          {String format = defDateTimeFormat,
-          String? locale,
-          bool isUtc = false,
-          DateTime? defaultValue}) =>
-      list.map((v) => toDateTime(v,
-          format: format,
-          locale: locale,
-          isUtc: isUtc,
-          defaultValue: defaultValue));
-
-  static Iterable<String?> toStrings(Iterable list, {String? defaultValue}) =>
-      list.map((v) => v?.toString() ?? defaultValue);
-}
+const String _defDateFormat = 'yyyy-MM-dd';
+const _trues = ['true', 'True', 't', 'T', 'Y', 'y'];
+const _falses = ['false', 'False', 'f', 'F', 'N', 'n'];
 
 extension ConvExt on Object {
   bool canToInt() {
@@ -135,15 +44,33 @@ extension ConvExt on Object {
     return false;
   }
 
-  bool canToBool(
-      {List<String> trues = const ['true', 'True'],
-      List<String> falses = const ['false', 'False']}) {
+  bool canToBool({List<String> trues = _trues, List<String> falses = _falses}) {
     if (this is bool) return true;
     if (this is num) return true;
     if (this is String) {
       if (trues.contains(this)) return true;
       if (falses.contains(this)) return true;
       return false;
+    }
+    return false;
+  }
+
+  bool canToDate({String format = _defDateFormat, String? locale}) {
+    if (this is num) return true;
+    if (this is DateTime) return true;
+    if (this is String) {
+      final num? n = num.tryParse(this as String);
+      if (n != null) {
+        return true;
+      }
+
+      final df = DateFormat(format, locale);
+      try {
+        df.parse(this as String);
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
     return false;
   }
@@ -183,8 +110,8 @@ extension ConvExt on Object {
   }
 
   bool? asBool(
-      {List<String> trues = const ['true', 'True'],
-      List<String> falses = const ['false', 'False'],
+      {List<String> trues = _trues,
+      List<String> falses = _falses,
       bool? defaultValue}) {
     if (this is bool) return this as bool;
     if (this is num) return this != 0;
@@ -192,6 +119,31 @@ extension ConvExt on Object {
       if (trues.contains(this)) return true;
       if (falses.contains(this)) return false;
       return defaultValue;
+    }
+    return defaultValue;
+  }
+
+  DateTime? asDate(
+      {String format = _defDateFormat,
+      String? locale,
+      bool isUtc = false,
+      DateTime? defaultValue}) {
+    if (this is num) {
+      return DateTime.fromMillisecondsSinceEpoch((this as num).toInt());
+    }
+    if (this is DateTime) return this as DateTime;
+    if (this is String) {
+      final num? n = num.tryParse(this as String);
+      if (n != null) {
+        return DateTime.fromMillisecondsSinceEpoch(n.toInt());
+      }
+
+      final df = DateFormat(format, locale);
+      try {
+        return df.parse(this as String, isUtc);
+      } catch (e) {
+        return defaultValue;
+      }
     }
     return defaultValue;
   }
@@ -213,6 +165,30 @@ extension NullableIterableConvExt<T> on Iterable<T?> {
 
   Iterable<num?> toNums({num? defaultValue}) =>
       map((v) => v?.asNum(defaultValue: defaultValue));
+
+  bool canToBools(
+          {List<String> trues = _trues, List<String> falses = _falses}) =>
+      every((v) => v?.canToBool(trues: trues, falses: falses) ?? true);
+
+  Iterable<bool?> toBools(
+          {List<String> trues = _trues,
+          List<String> falses = _falses,
+          bool? defaultValue}) =>
+      map((v) => v?.asBool(defaultValue: defaultValue));
+
+  bool canToDates({String format = _defDateFormat, String? locale}) =>
+      every((v) => v?.canToDate(format: format, locale: locale) ?? true);
+
+  Iterable<DateTime?> toDates(
+          {String format = _defDateFormat,
+          String? locale,
+          bool isUtc = false,
+          DateTime? defaultValue}) =>
+      map((v) => v?.asDate(
+          format: format,
+          locale: locale,
+          isUtc: isUtc,
+          defaultValue: defaultValue));
 }
 
 extension IterableConvExt<T extends Object> on Iterable<T> {
@@ -243,6 +219,45 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
         final ret = v.asNum(defaultValue: defaultValue);
         if (ret == null) {
           throw Exception('Cannot convert ${v.runtimeType} to num');
+        }
+        return ret;
+      });
+
+  bool canToBools(
+          {List<String> trues = _trues,
+          List<String> falses = _falses,
+          bool? defaultValue}) =>
+      every((v) => v.canToBool(trues: trues, falses: falses));
+
+  Iterable<bool> toBools(
+          {List<String> trues = _trues,
+          List<String> falses = _falses,
+          bool? defaultValue}) =>
+      map((v) {
+        final ret =
+            v.asBool(trues: trues, falses: falses, defaultValue: defaultValue);
+        if (ret == null) {
+          throw Exception('Cannot convert ${v.runtimeType} to bool');
+        }
+        return ret;
+      });
+
+  bool canToDates({String format = _defDateFormat, String? locale}) =>
+      every((v) => v.canToDate(format: format, locale: locale));
+
+  Iterable<DateTime> toDates(
+          {String format = _defDateFormat,
+          String? locale,
+          bool isUtc = false,
+          DateTime? defaultValue}) =>
+      map((v) {
+        final ret = v.asDate(
+            format: format,
+            locale: locale,
+            isUtc: isUtc,
+            defaultValue: defaultValue);
+        if (ret == null) {
+          throw Exception('Cannot convert ${v.runtimeType} to DateTime');
         }
         return ret;
       });
