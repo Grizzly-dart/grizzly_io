@@ -1,153 +1,10 @@
 /// Utility functions to convert dynamic columns in tables to typed columns
 library grizzly.io.transform;
 
+import 'package:duration/duration.dart';
 import 'package:intl/intl.dart';
 
 export 'table.dart';
-
-const String _defDateFormat = 'yyyy-MM-dd';
-const _trues = ['true', 'True', 't', 'T', 'Y', 'y'];
-const _falses = ['false', 'False', 'f', 'F', 'N', 'n'];
-
-extension _ConvExt on Object {
-  bool canToInt() {
-    if (this is int) {
-      return true;
-    } else if (this is num) {
-      return true;
-    } else if (this is String) {
-      return int.tryParse(this as String) != null;
-    }
-
-    return false;
-  }
-
-  bool canToDouble() {
-    if (this is double) {
-      return true;
-    } else if (this is num) {
-      return true;
-    } else if (this is String) {
-      return double.tryParse(this as String) != null;
-    }
-
-    return false;
-  }
-
-  bool canToNum() {
-    if (this is num) {
-      return true;
-    } else if (this is String) {
-      return num.tryParse(this as String) != null;
-    }
-
-    return false;
-  }
-
-  bool canToBool({List<String> trues = _trues, List<String> falses = _falses}) {
-    if (this is bool) return true;
-    if (this is num) return true;
-    if (this is String) {
-      if (trues.contains(this)) return true;
-      if (falses.contains(this)) return true;
-      return false;
-    }
-    return false;
-  }
-
-  bool canToDate({String format = _defDateFormat, String? locale}) {
-    if (this is num) return true;
-    if (this is DateTime) return true;
-    if (this is String) {
-      final num? n = num.tryParse(this as String);
-      if (n != null) {
-        return true;
-      }
-
-      final df = DateFormat(format, locale);
-      try {
-        df.parse(this as String);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }
-    return false;
-  }
-
-  int? asInt({int? defaultValue}) {
-    if (this is int) {
-      return this as int;
-    } else if (this is num) {
-      return (this as num).toInt();
-    } else if (this is String) {
-      return int.parse(this as String);
-    }
-
-    return defaultValue;
-  }
-
-  double? asDouble({double? defaultValue}) {
-    if (this is double) {
-      return this as double;
-    } else if (this is num) {
-      return (this as num).toDouble();
-    } else if (this is String) {
-      return double.parse(this as String);
-    }
-
-    return defaultValue;
-  }
-
-  num? asNum({num? defaultValue}) {
-    if (this is num) {
-      return this as num;
-    } else if (this is String) {
-      return num.parse(this as String);
-    }
-
-    return defaultValue;
-  }
-
-  bool? asBool(
-      {List<String> trues = _trues,
-      List<String> falses = _falses,
-      bool? defaultValue}) {
-    if (this is bool) return this as bool;
-    if (this is num) return this != 0;
-    if (this is String) {
-      if (trues.contains(this)) return true;
-      if (falses.contains(this)) return false;
-      return defaultValue;
-    }
-    return defaultValue;
-  }
-
-  DateTime? asDate(
-      {String format = _defDateFormat,
-      String? locale,
-      bool isUtc = false,
-      DateTime? defaultValue}) {
-    if (this is num) {
-      return DateTime.fromMillisecondsSinceEpoch((this as num).toInt());
-    }
-    if (this is DateTime) return this as DateTime;
-    if (this is String) {
-      final num? n = num.tryParse(this as String);
-      if (n != null) {
-        return DateTime.fromMillisecondsSinceEpoch(n.toInt());
-      }
-
-      final df = DateFormat(format, locale);
-      try {
-        return df.parse(this as String, isUtc);
-      } catch (e) {
-        return defaultValue;
-      }
-    }
-    return defaultValue;
-  }
-}
 
 extension NullableIterableConvExt<T> on Iterable<T?> {
   /// Checks that if `Iterable` [iterable] can be a `Iterable<int>`
@@ -190,6 +47,11 @@ extension NullableIterableConvExt<T> on Iterable<T?> {
           locale: locale,
           isUtc: isUtc,
           defaultValue: defaultValue));
+
+  bool canToDuration() => every((v) => v?.canToDuration() ?? true);
+
+  Iterable<Duration?> asDurations({Duration? defaultValue}) =>
+      map((v) => v?.asDuration(defaultValue: defaultValue));
 }
 
 extension IterableConvExt<T extends Object> on Iterable<T> {
@@ -259,6 +121,16 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
             defaultValue: defaultValue);
         if (ret == null) {
           throw Exception('Cannot convert ${v.runtimeType} to DateTime');
+        }
+        return ret;
+      });
+
+  bool get canToDurations => every((v) => v.canToDuration());
+
+  Iterable<Duration> asDurations({Duration? defaultValue}) => map((v) {
+        final ret = v.asDuration(defaultValue: defaultValue);
+        if (ret == null) {
+          throw Exception('Cannot convert ${v.runtimeType} to Duration');
         }
         return ret;
       });
@@ -353,7 +225,7 @@ extension ListConvExt on List<Object> {
     }
   }
 
-  void toDates(
+  void convertToDates(
       {String format = _defDateFormat,
       String? locale,
       bool isUtc = false,
@@ -369,5 +241,177 @@ extension ListConvExt on List<Object> {
       }
       this[i] = v;
     }
+  }
+
+  void convertToDurations({Duration? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      final v = this[i].asDuration(defaultValue: defaultValue);
+      if (v == null) {
+        throw Exception('Cannot convert ${v.runtimeType} to Duration');
+      }
+      this[i] = v;
+    }
+  }
+}
+
+const String _defDateFormat = 'yyyy-MM-dd';
+const _trues = ['true', 'True', 't', 'T', 'Y', 'y'];
+const _falses = ['false', 'False', 'f', 'F', 'N', 'n'];
+
+extension _ConvExt on Object {
+  bool canToInt() {
+    if (this is int) {
+      return true;
+    } else if (this is num) {
+      return true;
+    } else if (this is String) {
+      return int.tryParse(this as String) != null;
+    }
+
+    return false;
+  }
+
+  bool canToDouble() {
+    if (this is double) {
+      return true;
+    } else if (this is num) {
+      return true;
+    } else if (this is String) {
+      return double.tryParse(this as String) != null;
+    }
+
+    return false;
+  }
+
+  bool canToNum() {
+    if (this is num) {
+      return true;
+    } else if (this is String) {
+      return num.tryParse(this as String) != null;
+    }
+
+    return false;
+  }
+
+  bool canToBool({List<String> trues = _trues, List<String> falses = _falses}) {
+    if (this is bool) return true;
+    if (this is num) return true;
+    if (this is String) {
+      if (trues.contains(this)) return true;
+      if (falses.contains(this)) return true;
+      return false;
+    }
+    return false;
+  }
+
+  bool canToDate({String format = _defDateFormat, String? locale}) {
+    if (this is num) return true;
+    if (this is DateTime) return true;
+    if (this is String) {
+      final num? n = num.tryParse(this as String);
+      if (n != null) {
+        return true;
+      }
+
+      final df = DateFormat(format, locale);
+      try {
+        df.parse(this as String);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  bool canToDuration() {
+    if (this is Duration) return true;
+    if (this is int) return true;
+    if (this is String) {
+      return tryParseTime(this as String) != null;
+    }
+    return false;
+  }
+
+  int? asInt({int? defaultValue}) {
+    if (this is int) {
+      return this as int;
+    } else if (this is num) {
+      return (this as num).toInt();
+    } else if (this is String) {
+      return int.parse(this as String);
+    }
+
+    return defaultValue;
+  }
+
+  double? asDouble({double? defaultValue}) {
+    if (this is double) {
+      return this as double;
+    } else if (this is num) {
+      return (this as num).toDouble();
+    } else if (this is String) {
+      return double.parse(this as String);
+    }
+
+    return defaultValue;
+  }
+
+  num? asNum({num? defaultValue}) {
+    if (this is num) {
+      return this as num;
+    } else if (this is String) {
+      return num.parse(this as String);
+    }
+
+    return defaultValue;
+  }
+
+  bool? asBool(
+      {List<String> trues = _trues,
+      List<String> falses = _falses,
+      bool? defaultValue}) {
+    if (this is bool) return this as bool;
+    if (this is num) return this != 0;
+    if (this is String) {
+      if (trues.contains(this)) return true;
+      if (falses.contains(this)) return false;
+      return defaultValue;
+    }
+    return defaultValue;
+  }
+
+  DateTime? asDate(
+      {String format = _defDateFormat,
+      String? locale,
+      bool isUtc = false,
+      DateTime? defaultValue}) {
+    if (this is num) {
+      return DateTime.fromMillisecondsSinceEpoch((this as num).toInt());
+    }
+    if (this is DateTime) return this as DateTime;
+    if (this is String) {
+      final num? n = num.tryParse(this as String);
+      if (n != null) {
+        return DateTime.fromMillisecondsSinceEpoch(n.toInt());
+      }
+
+      final df = DateFormat(format, locale);
+      try {
+        return df.parse(this as String, isUtc);
+      } catch (e) {
+        return defaultValue;
+      }
+    }
+    return defaultValue;
+  }
+
+  Duration? asDuration({Duration? defaultValue}) {
+    if (this is Duration) return this as Duration;
+    if (this is int) return Duration(seconds: this as int);
+    if (this is String) {
+      return tryParseTime(this as String) ?? defaultValue;
+    }
+    return defaultValue;
   }
 }

@@ -5,21 +5,6 @@
 import 'package:grizzly_io/io_loader.dart';
 
 Future<void> main() async {
-  /*
-  String fs = r',';
-  String ts = r"'";
-
-  String input = """Name,Age,'House
-  (H)'""";
-
-  List<String> cols = CsvParser.parseRow(input, fs: fs, ts: ts);
-
-  if (cols == null) {
-    print(null);
-  } else {
-    cols.forEach(print);
-  }
-  */
   Table tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
   print(tsv);
   final out = encodeCsv(tsv.toListWithHeader(), fieldSep: '\t');
@@ -31,4 +16,18 @@ Future<void> main() async {
   print(tsv.toMap());
   tsv.column("Age").convertToDoubles();
   print(tsv.column(1));
+  print(tsv.rowToObject(0, GoTCharacter.fromMap));
+}
+
+class GoTCharacter {
+  final String name;
+  final double age;
+  final String house;
+
+  GoTCharacter({required this.name, required this.age, required this.house});
+
+  factory GoTCharacter.fromMap(Map map) =>
+      GoTCharacter(name: map['Name'], age: map['Age'], house: map['House	(h)']);
+
+  String toString() => 'Name => $name | Age => $age | House => $house';
 }
