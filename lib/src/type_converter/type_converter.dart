@@ -9,7 +9,7 @@ const String _defDateFormat = 'yyyy-MM-dd';
 const _trues = ['true', 'True', 't', 'T', 'Y', 'y'];
 const _falses = ['false', 'False', 'f', 'F', 'N', 'n'];
 
-extension ConvExt on Object {
+extension _ConvExt on Object {
   bool canToInt() {
     if (this is int) {
       return true;
@@ -153,33 +153,34 @@ extension NullableIterableConvExt<T> on Iterable<T?> {
   /// Checks that if `Iterable` [iterable] can be a `Iterable<int>`
   bool get canToInts => every((v) => v?.canToInt() ?? true);
 
-  Iterable<int?> toInts({int? defaultValue}) =>
+  Iterable<int?> asInts({int? defaultValue}) =>
       map((v) => v?.asInt(defaultValue: defaultValue));
 
   bool get canToDoubles => every((v) => v?.canToDouble() ?? true);
 
-  Iterable<double?> toDoubles({double? defaultValue}) =>
+  Iterable<double?> asDoubles({double? defaultValue}) =>
       map((v) => v?.asDouble(defaultValue: defaultValue));
 
   bool get canToNums => every((v) => v?.canToNum() ?? true);
 
-  Iterable<num?> toNums({num? defaultValue}) =>
+  Iterable<num?> asNums({num? defaultValue}) =>
       map((v) => v?.asNum(defaultValue: defaultValue));
 
   bool canToBools(
           {List<String> trues = _trues, List<String> falses = _falses}) =>
       every((v) => v?.canToBool(trues: trues, falses: falses) ?? true);
 
-  Iterable<bool?> toBools(
+  Iterable<bool?> asBools(
           {List<String> trues = _trues,
           List<String> falses = _falses,
           bool? defaultValue}) =>
-      map((v) => v?.asBool(defaultValue: defaultValue));
+      map((v) =>
+          v?.asBool(trues: trues, falses: falses, defaultValue: defaultValue));
 
   bool canToDates({String format = _defDateFormat, String? locale}) =>
       every((v) => v?.canToDate(format: format, locale: locale) ?? true);
 
-  Iterable<DateTime?> toDates(
+  Iterable<DateTime?> asDates(
           {String format = _defDateFormat,
           String? locale,
           bool isUtc = false,
@@ -195,7 +196,7 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
   /// Checks that if `Iterable` [iterable] can be a `Iterable<int>`
   bool get canToInts => every((v) => v.canToInt());
 
-  Iterable<int> toInts({int? defaultValue}) => map((v) {
+  Iterable<int> asInts({int? defaultValue}) => map((v) {
         final ret = v.asInt(defaultValue: defaultValue);
         if (ret == null) {
           throw Exception('Cannot convert ${v.runtimeType} to int');
@@ -205,7 +206,7 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
 
   bool get canToDoubles => every((v) => v.canToDouble());
 
-  Iterable<double> toDoubles({double? defaultValue}) => map((v) {
+  Iterable<double> asDoubles({double? defaultValue}) => map((v) {
         final ret = v.asDouble(defaultValue: defaultValue);
         if (ret == null) {
           throw Exception('Cannot convert ${v.runtimeType} to double');
@@ -215,7 +216,7 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
 
   bool get canToNums => every((v) => v.canToNum());
 
-  Iterable<num> toNums({num? defaultValue}) => map((v) {
+  Iterable<num> asNums({num? defaultValue}) => map((v) {
         final ret = v.asNum(defaultValue: defaultValue);
         if (ret == null) {
           throw Exception('Cannot convert ${v.runtimeType} to num');
@@ -229,7 +230,7 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
           bool? defaultValue}) =>
       every((v) => v.canToBool(trues: trues, falses: falses));
 
-  Iterable<bool> toBools(
+  Iterable<bool> asBools(
           {List<String> trues = _trues,
           List<String> falses = _falses,
           bool? defaultValue}) =>
@@ -245,7 +246,7 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
   bool canToDates({String format = _defDateFormat, String? locale}) =>
       every((v) => v.canToDate(format: format, locale: locale));
 
-  Iterable<DateTime> toDates(
+  Iterable<DateTime> asDates(
           {String format = _defDateFormat,
           String? locale,
           bool isUtc = false,
@@ -261,4 +262,112 @@ extension IterableConvExt<T extends Object> on Iterable<T> {
         }
         return ret;
       });
+}
+
+extension NullListConvExt on List<Object?> {
+  void convertToInts({int? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      this[i] = this[i]?.asInt(defaultValue: defaultValue);
+    }
+  }
+
+  void convertToDoubles({double? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      this[i] = this[i]?.asDouble(defaultValue: defaultValue);
+    }
+  }
+
+  void convertToNums({num? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      this[i] = this[i]?.asNum(defaultValue: defaultValue);
+    }
+  }
+
+  void convertToBools(
+      {List<String> trues = _trues,
+      List<String> falses = _falses,
+      bool? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      this[i] = this[i]
+          ?.asBool(trues: trues, falses: falses, defaultValue: defaultValue);
+    }
+  }
+
+  void toDates(
+      {String format = _defDateFormat,
+      String? locale,
+      bool isUtc = false,
+      DateTime? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      this[i] = this[i]?.asDate(
+          format: format,
+          locale: locale,
+          isUtc: isUtc,
+          defaultValue: defaultValue);
+    }
+  }
+}
+
+extension ListConvExt on List<Object> {
+  void convertToInts({int? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      final v = this[i].asInt(defaultValue: defaultValue);
+      if (v == null) {
+        throw Exception('Cannot convert ${v.runtimeType} to int');
+      }
+      this[i] = v;
+    }
+  }
+
+  void convertToDoubles({double? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      final v = this[i].asDouble(defaultValue: defaultValue);
+      if (v == null) {
+        throw Exception('Cannot convert ${v.runtimeType} to double');
+      }
+      this[i] = v;
+    }
+  }
+
+  void convertToNums({num? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      final v = this[i].asNum(defaultValue: defaultValue);
+      if (v == null) {
+        throw Exception('Cannot convert ${v.runtimeType} to num');
+      }
+      this[i] = v;
+    }
+  }
+
+  void convertToBools(
+      {List<String> trues = _trues,
+      List<String> falses = _falses,
+      bool? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      final v = this[i]
+          .asBool(trues: trues, falses: falses, defaultValue: defaultValue);
+      if (v == null) {
+        throw Exception('Cannot convert ${v.runtimeType} to bool');
+      }
+      this[i] = v;
+    }
+  }
+
+  void toDates(
+      {String format = _defDateFormat,
+      String? locale,
+      bool isUtc = false,
+      DateTime? defaultValue}) {
+    for (int i = 0; i < length; i++) {
+      final v = this[i].asDate(
+          format: format,
+          locale: locale,
+          isUtc: isUtc,
+          defaultValue: defaultValue);
+      if (v == null) {
+        throw Exception('Cannot convert ${v.runtimeType} to DateTime');
+      }
+      this[i] = v;
+    }
+  }
 }

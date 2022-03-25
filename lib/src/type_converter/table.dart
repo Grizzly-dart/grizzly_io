@@ -1,8 +1,5 @@
 import 'dart:collection';
 import 'dart:core';
-import 'package:grizzly_io/grizzly_io.dart';
-
-import 'type_converter.dart';
 
 class Table extends ListBase<List> {
   final List<String>? header;
@@ -11,13 +8,15 @@ class Table extends ListBase<List> {
 
   Table(this.header, this._rows);
 
-  factory Table.from(List<List<String?>> data, {bool hasHeader = false}) {
+  factory Table.from(List<List> data, {bool hasHeader = false}) {
     if (data.isEmpty) return Table(<String>[], <List>[]);
     List<String>? header;
-    List<List> rows = data;
+    List<List<dynamic>> rows;
     if (hasHeader) {
       header = data.first.cast<String>();
-      rows = rows.skip(1).toList();
+      rows = data.skip(1).map((e) => List<dynamic>.from(e)).toList();
+    } else {
+      rows = data.map((e) => List<dynamic>.from(e)).toList();
     }
     return Table(header, rows);
   }
@@ -58,6 +57,22 @@ class Table extends ListBase<List> {
   Iterable<O> toObjects<O>(O mapper(Map<String, dynamic> row)) =>
       toMap().map(mapper);
 
+  @override
+  int get length => _rows.length;
+
+  @override
+  List operator [](int index) => _rows[index];
+
+  @override
+  void operator []=(int index, List value) {
+    _rows[index] = value;
+  }
+
+  @override
+  set length(int newLength) {
+    _rows.length = newLength;
+  }
+
   int _toColIndex(/* String | int */ index) {
     int pos;
     if (index is String) {
@@ -73,24 +88,32 @@ class Table extends ListBase<List> {
     return pos;
   }
 
-  Iterable<T> column<T>(/* String | int */ index) {
+  List column(/* String | int */ index) {
     index = _toColIndex(index);
-    return _rows.map((r) => r[index]).cast<T>();
+    return _RowsToColumns(this, index);
   }
+}
+
+class _RowsToColumns<T> extends ListBase<T?> {
+  final List<List<T?>> _inner;
+
+  final int colIndex;
+
+  _RowsToColumns(this._inner, this.colIndex);
 
   @override
-  int get length => _rows.length;
+  int get length => _inner.isEmpty? 0: _inner.first.length;
 
   @override
-  List operator [](int index) => _rows[index];
+  T? operator [](int index) => _inner[index][colIndex];
 
   @override
-  void operator []=(int index, List value) {
-    _rows[index] = value;
+  void operator []=(int index, T? value) {
+    _inner[index][colIndex] = value;
   }
 
   @override
   set length(int newLength) {
-    _rows.length = newLength;
+    throw UnsupportedError('changing length of a column');
   }
 }

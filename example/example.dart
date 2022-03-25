@@ -27,6 +27,8 @@ Future<void> main() async {
   tsv = parseLTsv(out);
   print(tsv);
 
-  print(tsv.column("Age").asInt());
+  print(tsv.column("Age").asInts());
   print(tsv.toMap());
+  tsv.column("Age").convertToDoubles();
+  print(tsv.column(1));
 }
