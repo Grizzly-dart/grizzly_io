@@ -13,33 +13,33 @@ void main() {
       final file = File('data/labeled_tsv/normal.tsv');
       final tsv = parseLTsv(file.readAsStringSync());
       expect(tsv.header, ['Name', 'Age', 'House']);
-      expect(tsv.rows, hasLength(4));
-      expect(tsv.rows[0], ['Jon', '25', "Stark"]);
-      expect(tsv.rows[1], ['Dany', '28', "Targaryan"]);
-      expect(tsv.rows[2], ['Tyrion', '40', "Lannister"]);
-      expect(tsv.rows[3], ['Elia Martell', '75', "Martell"]);
+      expect(tsv, hasLength(4));
+      expect(tsv[0], ['Jon', '25', "Stark"]);
+      expect(tsv[1], ['Dany', '28', "Targaryan"]);
+      expect(tsv[2], ['Tyrion', '40', "Lannister"]);
+      expect(tsv[3], ['Elia Martell', '75', "Martell"]);
     });
 
     test('Quoted', () {
       final file = File('data/labeled_tsv/headers/quoted.tsv');
       final tsv = parseLTsv(file.readAsStringSync());
       expect(tsv.header, ['Name', 'Age', 'House']);
-      expect(tsv.rows, hasLength(4));
-      expect(tsv.rows[0], ['Jon', '25', "Stark"]);
-      expect(tsv.rows[1], ['Dany', '28', "Targaryan"]);
-      expect(tsv.rows[2], ['Tyrion', '40', "Lannister"]);
-      expect(tsv.rows[3], ['Elia Martell', '75', "Martell"]);
+      expect(tsv, hasLength(4));
+      expect(tsv[0], ['Jon', '25', "Stark"]);
+      expect(tsv[1], ['Dany', '28', "Targaryan"]);
+      expect(tsv[2], ['Tyrion', '40', "Lannister"]);
+      expect(tsv[3], ['Elia Martell', '75', "Martell"]);
     });
 
     test('Tab in label', () {
       final file = File('data/labeled_tsv/headers/tab_in_label.tsv');
       final tsv = parseLTsv(file.readAsStringSync());
       expect(tsv.header, ['Name', 'Age', 'House\t(h)']);
-      expect(tsv.rows, hasLength(4));
-      expect(tsv.rows[0], ['Jon', '25', "Stark"]);
-      expect(tsv.rows[1], ['Dany', '28', "Targaryan"]);
-      expect(tsv.rows[2], ['Tyrion', '40', "Lannister"]);
-      expect(tsv.rows[3], ['Elia Martell', '75', "Martell"]);
+      expect(tsv, hasLength(4));
+      expect(tsv[0], ['Jon', '25', "Stark"]);
+      expect(tsv[1], ['Dany', '28', "Targaryan"]);
+      expect(tsv[2], ['Tyrion', '40', "Lannister"]);
+      expect(tsv[3], ['Elia Martell', '75', "Martell"]);
     });
   });
 }
