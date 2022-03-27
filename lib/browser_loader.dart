@@ -15,7 +15,7 @@ import 'package:grizzly_io/grizzly_io.dart';
 export 'package:grizzly_io/grizzly_io.dart';
 
 /// Downloads the TSV file from specified [url] and returns the parsed data
-Future<Table> requestLCsv(String url,
+Future<CSV> requestLCsv(String url,
     {String fieldSep = ',',
     String textSep = '"',
     bool multiline = true}) async {
@@ -36,14 +36,14 @@ Future<List<List<String>>> requestCsv(String url,
       fieldSep: fieldSep, textSep: textSep, multiline: multiline);
 }
 
-Future<Table> requestLTsv(String url) async {
+Future<CSV> requestLTsv(String url) async {
   final client = BrowserClient();
   final Response resp = await client.get(Uri.parse(url));
   return parseLTsv(resp.body);
 }
 
 /// Reads file/blob as labeled TSV file
-Future<Table> readLTsv(Blob file, {Encoding encoding = utf8}) async {
+Future<CSV> readLTsv(Blob file, {Encoding encoding = utf8}) async {
   final reader = FileReader();
   reader.readAsText(file);
   await reader.onLoadEnd.first;

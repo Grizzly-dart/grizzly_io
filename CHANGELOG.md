@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.0.0
+
+**Breaking changes**:
++ Renamed `Table` to `CSV`
++ Migrated type conversion methods to use Dart extensions
++ 
+
 ## 3.0.1
 
 + Updated homepage in pubspec

@@ -5,7 +5,7 @@
 import 'package:grizzly_io/io_loader.dart';
 
 Future<void> main() async {
-  Table tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
+  CSV tsv = await readLTsv('data/labeled_tsv/headers/tab_in_label.tsv');
   print(tsv);
   final out = encodeCsv(tsv.toListWithHeader(), fieldSep: '\t');
   print(out);

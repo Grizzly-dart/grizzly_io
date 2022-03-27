@@ -4,8 +4,6 @@ library grizzly.io.transform;
 import 'package:duration/duration.dart';
 import 'package:intl/intl.dart';
 
-export 'table.dart';
-
 extension NullableIterableConvExt<T> on Iterable<T?> {
   /// Checks that if `Iterable` [iterable] can be a `Iterable<int>`
   bool get canToInts => every((v) => v?.canToInt() ?? true);

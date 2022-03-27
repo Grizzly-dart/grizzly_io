@@ -14,7 +14,7 @@ import 'package:grizzly_io/grizzly_io.dart';
 export 'package:grizzly_io/grizzly_io.dart';
 
 /// Downloads the TSV file from specified [url] and returns the parsed data
-Future<Table> requestLCsv(String url,
+Future<CSV> requestLCsv(String url,
     {String fieldSep = ',',
     String textSep = '"',
     bool multiline = true}) async {
@@ -36,7 +36,7 @@ Future<List<List<String>>> requestCsv(String url,
 }
 
 /// Downloads the TSV file from specified [url] and returns the parsed data
-Future<Table> requestLTsv(String url) async {
+Future<CSV> requestLTsv(String url) async {
   final client = Client();
   final Response resp = await client.get(Uri.parse(url));
   return parseLTsv(resp.body);
@@ -49,26 +49,32 @@ Future<List<List<String>>> readCsv(String path,
     String textSep = '"',
     bool multiline = true}) async {
   final File file = File(path);
-  if (!await file.exists()) throw Exception('File not found!');
   return parseCsv(await file.readAsString(encoding: encoding),
       fieldSep: fieldSep, textSep: textSep, multiline: multiline);
 }
 
+Stream<List<String>> streamCsv(String path,
+    {Encoding encoding = utf8,
+    String fieldSep = ',',
+    String textSep = '"',
+    bool multiline = true}) {
+  return CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
+      .convertStream(File(path).openRead().transform(encoding.decoder));
+}
+
 /// Reads file at specified path [path] as TSV file
-Future<Table> readLCsv(String path,
+Future<CSV> readLCsv(String path,
     {Encoding encoding = utf8,
     String fieldSep = ',',
     String textSep = '"',
     bool multiline = true}) async {
   final File file = File(path);
-  if (!await file.exists()) throw Exception('File not found!');
   return parseLCsv(await file.readAsString(encoding: encoding),
       fieldSep: fieldSep, textSep: textSep, multiline: multiline);
 }
 
 /// Reads file at specified path [path] as TSV file
-Future<Table> readLTsv(String path, {Encoding encoding = utf8}) async {
+Future<CSV> readLTsv(String path, {Encoding encoding = utf8}) async {
   final File file = File(path);
-  if (!await file.exists()) throw Exception('File not found!');
   return parseLTsv(await file.readAsString(encoding: encoding));
 }

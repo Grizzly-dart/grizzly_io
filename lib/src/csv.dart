@@ -1,15 +1,15 @@
 import 'dart:collection';
 import 'dart:core';
 
-class Table extends ListBase<List> {
+class CSV extends ListBase<List> {
   final List<String>? header;
 
   final List<List> _rows;
 
-  Table(this.header, this._rows);
+  CSV(this.header, this._rows);
 
-  factory Table.from(List<List> data, {bool hasHeader = false}) {
-    if (data.isEmpty) return Table(<String>[], <List>[]);
+  factory CSV.from(List<List> data, {bool hasHeader = false}) {
+    if (data.isEmpty) return CSV(<String>[], <List>[]);
     List<String>? header;
     List<List<dynamic>> rows;
     if (hasHeader) {
@@ -18,7 +18,7 @@ class Table extends ListBase<List> {
     } else {
       rows = data.map((e) => List<dynamic>.from(e)).toList();
     }
-    return Table(header, rows);
+    return CSV(header, rows);
   }
 
   List<List> toListWithHeader() {
@@ -102,7 +102,7 @@ class _RowsToColumns<T> extends ListBase<T?> {
   _RowsToColumns(this._inner, this.colIndex);
 
   @override
-  int get length => _inner.isEmpty? 0: _inner.first.length;
+  int get length => _inner.isEmpty ? 0 : _inner.first.length;
 
   @override
   T? operator [](int index) => _inner[index][colIndex];

@@ -7,7 +7,7 @@
 library grizzly.io.csv.parser;
 
 import 'dart:convert';
-import 'package:grizzly_io/src/type_converter/type_converter.dart' show Table;
+import 'package:grizzly_io/src/csv.dart';
 
 /// Parses the given CSV buffer
 List<List<String>> parseCsv(String buffer,
@@ -16,7 +16,7 @@ List<List<String>> parseCsv(String buffer,
         .convert(buffer);
 
 /// Parses the given labeled CSV buffer
-Table parseLCsv(String buffer,
+CSV parseLCsv(String buffer,
         {String fieldSep = ',', String textSep = '"', bool multiline = true}) =>
     CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
         .convertLabeled(buffer);
@@ -39,7 +39,13 @@ class CsvParser {
   const CsvParser(
       {this.fieldSep = ',', this.textSep = '"', this.multiline = true});
 
-  Table convertLabeled(String csv) => Table.from(convert(csv), hasHeader: true);
+  CSV convertLabeled(String csv) => CSV.from(convert(csv), hasHeader: true);
+
+  List<List<String>> convert(String buffer, {bool multiline = true}) {
+    final Iterable<String> lines = LineSplitter.split(buffer).toList();
+
+    return convertLines(lines, multiline: multiline);
+  }
 
   /// Parses single CSV row [csv]
   ///
@@ -58,10 +64,32 @@ class CsvParser {
     return ret;
   }
 
-  List<List<String>> convert(String buffer, {bool multiline = true}) {
-    final Iterable<String> lines = LineSplitter.split(buffer).toList();
+  Stream<List<String>> convertStream(Stream<String> stream,
+      {bool? multiline}) async* {
+    final bool isMultiline = multiline ?? this.multiline;
 
-    return convertLines(lines, multiline: multiline);
+    String? previousLine;
+    await for (final line in stream.transform(LineSplitter())) {
+      if (previousLine == null) {
+        final List<String>? row = parseRow(line, fs: fieldSep, ts: textSep);
+        if (row != null) {
+          yield row;
+        } else {
+          if (!isMultiline) {
+            throw Exception('Invalid row!');
+          }
+          previousLine = line;
+        }
+      } else {
+        previousLine = previousLine + '\r\n' + line;
+        final List<String>? row =
+            parseRow(previousLine, fs: fieldSep, ts: textSep);
+        if (row != null) {
+          yield row;
+          previousLine = null;
+        }
+      }
+    }
   }
 
   /// Parses given CSV [lines]
@@ -97,8 +125,6 @@ class CsvParser {
 
     return ret;
   }
-
-  // TODO(tejag): streaming parser
 
   /// Parses single CSV row [input] with field separator [fs] and text separator
   /// [ts]
