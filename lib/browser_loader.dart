@@ -8,39 +8,9 @@ library grizzly.io.browser_loader;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'package:http/http.dart';
-import 'package:http/browser_client.dart';
 import 'package:grizzly_io/grizzly_io.dart';
 
 export 'package:grizzly_io/grizzly_io.dart';
-
-/// Downloads the TSV file from specified [url] and returns the parsed data
-Future<CSV> requestLCsv(String url,
-    {String fieldSep = ',',
-    String textSep = '"',
-    bool multiline = true}) async {
-  final client = BrowserClient();
-  final Response resp = await client.get(Uri.parse(url));
-  return parseLCsv(resp.body,
-      fieldSep: fieldSep, textSep: textSep, multiline: multiline);
-}
-
-/// Downloads the TSV file from specified [url] and returns the parsed data
-Future<List<List<String>>> requestCsv(String url,
-    {String fieldSep = ',',
-    String textSep = '"',
-    bool multiline = true}) async {
-  final client = BrowserClient();
-  final Response resp = await client.get(Uri.parse(url));
-  return parseCsv(resp.body,
-      fieldSep: fieldSep, textSep: textSep, multiline: multiline);
-}
-
-Future<CSV> requestLTsv(String url) async {
-  final client = BrowserClient();
-  final Response resp = await client.get(Uri.parse(url));
-  return parseLTsv(resp.body);
-}
 
 /// Reads file/blob as labeled TSV file
 Future<CSV> readLTsv(Blob file, {Encoding encoding = utf8}) async {

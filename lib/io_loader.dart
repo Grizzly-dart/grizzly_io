@@ -8,38 +8,14 @@ library grizzly.io.io_loader;
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart';
 import 'package:grizzly_io/grizzly_io.dart';
 
 export 'package:grizzly_io/grizzly_io.dart';
 
-/// Downloads the TSV file from specified [url] and returns the parsed data
-Future<CSV> requestLCsv(String url,
-    {String fieldSep = ',',
+extension CSVExt on HttpClientResponse {
+  Stream<List<String>> parseCsv({String fieldSep = ',',
     String textSep = '"',
-    bool multiline = true}) async {
-  final client = Client();
-  final Response resp = await client.get(Uri.parse(url));
-  return parseLCsv(resp.body,
-      fieldSep: fieldSep, textSep: textSep, multiline: multiline);
-}
-
-/// Downloads the TSV file from specified [url] and returns the parsed data
-Future<List<List<String>>> requestCsv(String url,
-    {String fieldSep = ',',
-    String textSep = '"',
-    bool multiline = true}) async {
-  final client = Client();
-  final Response resp = await client.get(Uri.parse(url));
-  return parseCsv(resp.body,
-      fieldSep: fieldSep, textSep: textSep, multiline: multiline);
-}
-
-/// Downloads the TSV file from specified [url] and returns the parsed data
-Future<CSV> requestLTsv(String url) async {
-  final client = Client();
-  final Response resp = await client.get(Uri.parse(url));
-  return parseLTsv(resp.body);
+    bool multiline = true}) => CsvParser().convertStream(Stream.)
 }
 
 /// Reads file at specified path [path] as TSV file

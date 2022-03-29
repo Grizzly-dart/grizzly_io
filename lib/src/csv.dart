@@ -51,12 +51,6 @@ class CSV extends ListBase<List> {
     }
   }
 
-  O rowToObject<O>(int index, O mapper(Map<String, dynamic> row)) =>
-      mapper(rowToMap(index));
-
-  Iterable<O> toObjects<O>(O mapper(Map<String, dynamic> row)) =>
-      toMap().map(mapper);
-
   @override
   int get length => _rows.length;
 

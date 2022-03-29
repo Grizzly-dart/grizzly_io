@@ -16,18 +16,4 @@ Future<void> main() async {
   print(tsv.toMap());
   tsv.column("Age").convertToDoubles();
   print(tsv.column(1));
-  print(tsv.rowToObject(0, GoTCharacter.fromMap));
-}
-
-class GoTCharacter {
-  final String name;
-  final double age;
-  final String house;
-
-  GoTCharacter({required this.name, required this.age, required this.house});
-
-  factory GoTCharacter.fromMap(Map map) =>
-      GoTCharacter(name: map['Name'], age: map['Age'], house: map['House	(h)']);
-
-  String toString() => 'Name => $name | Age => $age | House => $house';
 }
