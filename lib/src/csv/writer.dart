@@ -2,7 +2,7 @@ library grizzly.io.csv.writer;
 
 String encodeCsv(List<List> data,
     {String fieldSep = ',', String textSep = '"'}) {
-  StringBuffer sb = StringBuffer();
+  final sb = StringBuffer();
   data.map((List row) {
     return row.map((col) {
       String scol = col.toString();

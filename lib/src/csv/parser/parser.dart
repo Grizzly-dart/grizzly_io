@@ -9,17 +9,9 @@ library grizzly.io.csv.parser;
 import 'dart:convert';
 import 'package:grizzly_io/src/csv.dart';
 
-/// Parses the given CSV buffer
-List<List<String>> parseCsv(String buffer,
-        {String fieldSep = ',', String textSep = '"', bool multiline = true}) =>
-    CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
-        .parse(buffer);
+const csv = CsvParser();
 
-/// Parses the given labeled CSV buffer
-CSV parseLCsv(String buffer,
-        {String fieldSep = ',', String textSep = '"', bool multiline = true}) =>
-    CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
-        .convertLabeled(buffer);
+const tsv = CsvParser.tsv();
 
 /// Parser of CSV-like file formats
 class CsvParser {
@@ -33,28 +25,31 @@ class CsvParser {
   /// Defaults to `"`
   final String textSep;
 
+  final String lineSep;
+
   /// Can a row span multiple lines?
   final bool multiline;
 
   const CsvParser(
-      {this.fieldSep = ',', this.textSep = '"', this.multiline = true});
+      {this.fieldSep = ',',
+      this.textSep = '"',
+      this.multiline = true,
+      this.lineSep = '\n'});
 
-  const CsvParser.tsv({this.textSep = '"', this.multiline = true})
+  const CsvParser.tsv(
+      {this.textSep = '"', this.multiline = true, this.lineSep = '\n'})
       : fieldSep = '\t';
 
   /// Parses the given CSV content and returns the rows it contains
-  List<List<String>> parse(String buffer) {
-    final Iterable<String> lines = LineSplitter.split(buffer).toList();
-
-    return parseLines(lines);
-  }
+  Iterable<List<String>> parse(String buffer) =>
+      parseLines(LineSplitter.split(buffer));
 
   /// Parses a single CSV row [csv].
   ///
   /// Throws if the row is invalid!
   ///
   ///     parser.convertRow('Name,'Age',House');  // => [Name, Age, House]
-  List<String>? parseRow(String csv) {
+  List<String> parseRow(String csv) {
     final ret = parseIncompleteRow(csv);
 
     if (ret == null) {
@@ -64,43 +59,13 @@ class CsvParser {
     return ret;
   }
 
-  Stream<List<String>> parseLineStream(Stream<String> stream,
-      {bool? multiline}) async* {
-    final bool isMultiline = multiline ?? this.multiline;
-
+  Stream<List<String>> parseLineStream(Stream<String> stream) async* {
     String? previousLine;
     await for (final line in stream.transform(LineSplitter())) {
       if (previousLine == null) {
         final List<String>? row = parseIncompleteRow(line);
         if (row != null) {
           yield row;
-        } else {
-          if (!isMultiline) {
-            throw Exception('Invalid row!');
-          }
-          previousLine = line;
-        }
-      } else {
-        previousLine = previousLine + '\r\n' + line;
-        final List<String>? row = parseIncompleteRow(previousLine);
-        if (row != null) {
-          yield row;
-          previousLine = null;
-        }
-      }
-    }
-  }
-
-  /// Parses given CSV [lines]
-  List<List<String>> parseLines(Iterable<String> lines) {
-    final List<List<String>> ret = [];
-
-    String? previousLine;
-    for (String line in lines) {
-      if (previousLine == null) {
-        final List<String>? row = parseIncompleteRow(line);
-        if (row != null) {
-          ret.add(row);
         } else {
           if (!multiline) {
             throw Exception('Invalid row!');
@@ -111,13 +76,44 @@ class CsvParser {
         previousLine = previousLine + '\r\n' + line;
         final List<String>? row = parseIncompleteRow(previousLine);
         if (row != null) {
-          ret.add(row);
+          yield row;
           previousLine = null;
         }
       }
     }
 
-    return ret;
+    if (previousLine != null) {
+      throw Exception('incomplete or invalid last row');
+    }
+  }
+
+  /// Parses given CSV [lines]
+  Iterable<List<String>> parseLines(Iterable<String> lines) sync* {
+    String? previousLine;
+    for (String line in lines) {
+      if (previousLine == null) {
+        final List<String>? row = parseIncompleteRow(line);
+        if (row != null) {
+          yield row;
+        } else {
+          if (!multiline) {
+            throw Exception('Invalid row!');
+          }
+          previousLine = line;
+        }
+      } else {
+        previousLine = previousLine + '\r\n' + line;
+        final List<String>? row = parseIncompleteRow(previousLine);
+        if (row != null) {
+          yield row;
+          previousLine = null;
+        }
+      }
+    }
+
+    if (previousLine != null) {
+      throw Exception('incomplete or invalid last row');
+    }
   }
 
   /// Parses single potentially incomplete multiline CSV row [input]
@@ -187,4 +183,19 @@ class CsvParser {
 
     return columns;
   }
+
+  String encode(List<List> data) {
+    final sb = StringBuffer();
+    data.map(encodeRow).forEach((row) => sb.writeAll([row, lineSep]));
+    return sb.toString();
+  }
+
+  String encodeRow(List row) => row.map((col) {
+        String scol = col.toString();
+        if (scol.contains(fieldSep) || scol.contains(lineSep)) {
+          // TODO what if scol contains textSep?
+          scol = '$textSep$scol$textSep';
+        }
+        return scol;
+      }).join(fieldSep);
 }
