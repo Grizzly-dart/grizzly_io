@@ -7,14 +7,12 @@ library grizzly.io;
 export 'src/csv.dart';
 export 'src/csv/writer.dart';
 export 'src/csv/parser/parser.dart';
-export 'src/tsv/tsv.dart';
 export 'src/type_converter/type_converter.dart';
 import 'package:http/http.dart';
 
 import 'src/csv.dart';
 import 'src/csv/writer.dart';
 import 'src/csv/parser/parser.dart';
-import 'src/tsv/tsv.dart';
 
 /// Downloads the TSV file from specified [url] and returns the parsed data
 Future<CSV> requestLCsv(String url,

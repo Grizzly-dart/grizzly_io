@@ -15,7 +15,7 @@ export 'package:grizzly_io/grizzly_io.dart';
 extension CSVExt on HttpClientResponse {
   Stream<List<String>> parseCsv({String fieldSep = ',',
     String textSep = '"',
-    bool multiline = true}) => CsvParser().convertStream(Stream.)
+    bool multiline = true}) => CsvParser().parseLineStream(Stream.)
 }
 
 /// Reads file at specified path [path] as TSV file
@@ -35,7 +35,7 @@ Stream<List<String>> streamCsv(String path,
     String textSep = '"',
     bool multiline = true}) {
   return CsvParser(fieldSep: fieldSep, textSep: textSep, multiline: multiline)
-      .convertStream(File(path).openRead().transform(encoding.decoder));
+      .parseLineStream(File(path).openRead().transform(encoding.decoder));
 }
 
 /// Reads file at specified path [path] as TSV file
