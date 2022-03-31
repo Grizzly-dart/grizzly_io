@@ -6,9 +6,8 @@ import 'package:grizzly_io/grizzly_io.dart';
 import 'package:test/test.dart';
 
 void main() {
+  /*
   group('LabeledTsv.Header', () {
-    setUp(() {});
-
     test('Normal', () async {
       final data = (await tsv.read('data/labeled_tsv/normal.tsv')).toList();
       expect(data.header, ['Name', 'Age', 'House']);
@@ -41,4 +40,5 @@ void main() {
       expect(tsv[3], ['Elia Martell', '75', "Martell"]);
     });
   });
+   */
 }
