@@ -5,4 +5,5 @@
 library grizzly.io;
 
 export 'src/csv/csv.dart';
+export 'src/json/json.dart';
 export 'src/structure/structure.dart';
