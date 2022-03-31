@@ -1,20 +1,21 @@
-/// Provides [CsvParser] class to parse CSV-like file formats
+/// Provides [CSV] class to parse CSV-like file formats
 ///
 /// [parseCsv] and [parseLCsv]  are convenience function to parse CSV
 /// and labeled CSV respectively.
 ///
-/// Static method [CsvParser.parseRow] can be used parse a single row.
+/// Static method [CSV.parseRow] can be used parse a single row.
 library grizzly.io.csv.parser;
 
 import 'dart:convert';
-import 'package:grizzly_io/src/csv.dart';
 
-const csv = CsvParser();
+export 'medium_io.dart' if (dart.library.html) 'medium_html.dart';
 
-const tsv = CsvParser.tsv();
+const csv = CSV();
+
+const tsv = CSV.tsv();
 
 /// Parser of CSV-like file formats
-class CsvParser {
+class CSV {
   /// Field separator
   ///
   /// Defaults to `,`
@@ -30,13 +31,13 @@ class CsvParser {
   /// Can a row span multiple lines?
   final bool multiline;
 
-  const CsvParser(
+  const CSV(
       {this.fieldSep = ',',
       this.textSep = '"',
       this.multiline = true,
       this.lineSep = '\n'});
 
-  const CsvParser.tsv(
+  const CSV.tsv(
       {this.textSep = '"', this.multiline = true, this.lineSep = '\n'})
       : fieldSep = '\t';
 
@@ -59,7 +60,11 @@ class CsvParser {
     return ret;
   }
 
-  Stream<List<String>> parseLineStream(Stream<String> stream) async* {
+  Stream<List<String>> parseByteStream(Stream<List<int>> stream,
+          {Encoding encoding = utf8}) =>
+      parseStringStream(stream.transform(encoding.decoder));
+
+  Stream<List<String>> parseStringStream(Stream<String> stream) async* {
     String? previousLine;
     await for (final line in stream.transform(LineSplitter())) {
       if (previousLine == null) {
@@ -184,7 +189,7 @@ class CsvParser {
     return columns;
   }
 
-  String encode(List<List> data) {
+  String encode(Iterable<List> data) {
     final sb = StringBuffer();
     data.map(encodeRow).forEach((row) => sb.writeAll([row, lineSep]));
     return sb.toString();

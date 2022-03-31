@@ -1,15 +1,17 @@
 import 'dart:collection';
 import 'dart:core';
 
-class CSV extends ListBase<List> {
+export 'type_converter.dart';
+
+class Structure extends ListBase<List> {
   final List<String>? header;
 
   final List<List> _rows;
 
-  CSV(this.header, this._rows);
+  Structure(this.header, this._rows);
 
-  factory CSV.from(List<List> data, {bool hasHeader = false}) {
-    if (data.isEmpty) return CSV(<String>[], <List>[]);
+  factory Structure.from(List<List> data, {bool hasHeader = false}) {
+    if (data.isEmpty) return Structure(<String>[], <List>[]);
     List<String>? header;
     List<List<dynamic>> rows;
     if (hasHeader) {
@@ -18,7 +20,7 @@ class CSV extends ListBase<List> {
     } else {
       rows = data.map((e) => List<dynamic>.from(e)).toList();
     }
-    return CSV(header, rows);
+    return Structure(header, rows);
   }
 
   List<List> toListWithHeader() {
