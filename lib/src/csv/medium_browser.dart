@@ -17,4 +17,10 @@ extension DartIOCSVExt on CSV {
     }
     return parse(reader.result as String);
   }
+
+  Stream<List<String>> request(Uri url, {Encoding encoding = utf8}) async* {
+    final client = HttpRequest();
+    // TODO
+    throw UnimplementedError();
+  }
 }
