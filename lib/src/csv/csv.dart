@@ -8,7 +8,7 @@ library grizzly.io.csv.parser;
 
 import 'dart:convert';
 
-export 'medium_io.dart' if (dart.library.html) 'medium_html.dart';
+export 'medium_io.dart' if (dart.library.html) 'medium_browser.dart';
 
 const csv = CSV();
 
