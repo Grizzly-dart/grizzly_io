@@ -31,10 +31,33 @@ class JSON {
 }
 
 bool _isBuiltin(dynamic v) =>
-    v is String || v is num || v is bool || v is DateTime || v is Duration;
+    v == null ||
+    v is String ||
+    v is num ||
+    v is bool ||
+    v is DateTime ||
+    v is Duration;
 
-List<Map<String, List<dynamic>>> _flattenMap(Map map) {
-  if(map.values.every(_isBuiltin)) {
-    return map.map((key, value) => MapEntry<String, List<dynamic>>(key, [value]));
+Map<String, List<dynamic>> _flattenMap(Map map) {
+  if (map.values.every(_isBuiltin)) {
+    return map
+        .map((key, value) => MapEntry<String, List<dynamic>>(key, [value]));
   }
+
+  final ret = <String, List<dynamic>>{};
+  final scalars = <MapEntry>[];
+
+  for(final entry in map.entries) {
+    if(_isBuiltin(entry.value)) {
+      scalars.add(entry);
+    } else if(entry.value is List) {
+      // TODO
+    } else if(entry.value is Map) {
+      final processedMap = _flattenMap(entry.value);
+      // TODO
+    }
+    // TODO
+  }
+
+  throw UnimplementedError();
 }
