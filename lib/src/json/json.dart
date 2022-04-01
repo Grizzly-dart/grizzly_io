@@ -22,7 +22,7 @@ class JSON {
   }
 
   static Iterable<List<dynamic>> _parseListOfList(List<List> list) {
-    if (list.every((List r) => r.every(_isLeaf))) {
+    if (list.every((List r) => r.every(_isBuiltin))) {
       return list;
     } else {
       throw UnimplementedError();
@@ -30,5 +30,11 @@ class JSON {
   }
 }
 
-bool _isLeaf(dynamic v) =>
+bool _isBuiltin(dynamic v) =>
     v is String || v is num || v is bool || v is DateTime || v is Duration;
+
+List<Map<String, List<dynamic>>> _flattenMap(Map map) {
+  if(map.values.every(_isBuiltin)) {
+    return map.map((key, value) => MapEntry<String, List<dynamic>>(key, [value]));
+  }
+}
