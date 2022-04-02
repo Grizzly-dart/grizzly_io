@@ -16,6 +16,10 @@ class JSON {
       } else {
         throw UnsupportedError('unsupported ');
       }
+    } else if (j is Map) {
+      final data = <String?, List>{};
+      _flattenMap(null, j, data);
+      return data.entries.map((e) => [e.key, ...e.value]);
     } else {
       throw UnsupportedError('unsupported ');
     }
@@ -38,26 +42,54 @@ bool _isBuiltin(dynamic v) =>
     v is DateTime ||
     v is Duration;
 
-Map<String, List<dynamic>> _flattenMap(Map map) {
+void _flattenMap(String? name, Map map, Map<String?, List<dynamic>> ret) {
+  int length = ret.isEmpty ? 0 : ret.values.first.length;
+
   if (map.values.every(_isBuiltin)) {
-    return map
-        .map((key, value) => MapEntry<String, List<dynamic>>(key, [value]));
-  }
-
-  final ret = <String, List<dynamic>>{};
-  final scalars = <MapEntry>[];
-
-  for(final entry in map.entries) {
-    if(_isBuiltin(entry.value)) {
-      scalars.add(entry);
-    } else if(entry.value is List) {
-      // TODO
-    } else if(entry.value is Map) {
-      final processedMap = _flattenMap(entry.value);
-      // TODO
+    if (name != null) {
+      ret[null] = (ret[null] ?? [])..add(name);
     }
-    // TODO
+
+    for (final entry in map.entries) {
+      ret[entry.key] = (ret[entry.key] ??
+          List.filled(length, null, growable: true))
+        ..add(entry.value);
+    }
+    ret.values.where((r) => r.length == length).forEach((r) => r.add(null));
+    return;
   }
 
-  throw UnimplementedError();
+  map.entries.where((e) => e.value is Map).forEach((entry) {
+    _flattenMap(entry.key, entry.value, ret);
+  });
+
+  map.entries.where((e) => e.value is List).forEach((entry) {
+    ret[null] = (ret[null] ?? [])..add(entry.key);
+
+    final list = entry.value as List;
+    int i = 0;
+    for (final row in ret.entries) {
+      if (row.key == null) {
+        continue;
+      }
+      if (i < list.length) {
+        row.value.add(list[i++]);
+      } else {
+        row.value.add(null);
+      }
+    }
+    /* TODO(tejag): add remaining
+      for(; i < list.length; i++) {
+        ret.ad
+      }*/
+  });
+
+  map.entries
+      .where((e) => e.value is! List && e.value is! Map)
+      .forEach((entry) {
+    ret[null] = (ret[null] ?? [])..add(entry.key);
+    ret.entries
+        .where((r) => r.key != null)
+        .forEach((r) => r.value.add(entry.value));
+  });
 }

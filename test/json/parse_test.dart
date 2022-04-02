@@ -8,5 +8,10 @@ void main() {
       print(data);
       // TODO
     });
+    test('parse1', () async {
+      final data = await JSON().read('data/json/map1.json');
+      print(data);
+      // TODO
+    });
   });
 }
