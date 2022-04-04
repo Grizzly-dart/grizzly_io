@@ -12,7 +12,7 @@ class JSON {
         return _parseListOfList(j.cast<List>());
       } else if (j.every((e) => e is Map)) {
         final data = <String?, List>{};
-        for(final map in j) {
+        for (final map in j) {
           _flattenMap(null, map, data);
         }
         return data.entries.map((e) => [e.key, ...e.value]);
@@ -95,4 +95,24 @@ void _flattenMap(String? name, Map map, Map<String?, List<dynamic>> ret) {
         .where((r) => r.key != null)
         .forEach((r) => r.value.add(entry.value));
   });
+}
+
+void _flattenListMap(
+    List<Map<String, dynamic>> list, Map<String?, List<dynamic>> ret) {
+  for (final item in list) {
+    int length = ret.isEmpty ? 0 : ret.values.first.length;
+    for (final entry in item.entries) {
+      ret[entry.key] = (ret[entry.key] ?? List.filled(length, null))
+        ..add(entry.value);
+    }
+    _equalizeMapListLength(ret, length + 1);
+  }
+}
+
+void _equalizeMapListLength(Map<dynamic, List<dynamic>> map, int length) {
+  for (final item in map.values) {
+    if (item.length != length) {
+      item.length = length;
+    }
+  }
 }

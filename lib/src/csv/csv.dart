@@ -14,6 +14,8 @@ const csv = CSV();
 
 const tsv = CSV.tsv();
 
+const ssv = CSV.ssv();
+
 /// Parser of CSV-like file formats
 class CSV {
   /// Field separator
@@ -40,6 +42,10 @@ class CSV {
   const CSV.tsv(
       {this.textSep = '"', this.multiline = true, this.lineSep = '\n'})
       : fieldSep = '\t';
+
+  const CSV.ssv(
+      {this.textSep = '"', this.multiline = true, this.lineSep = '\n'})
+      : fieldSep = ' ';
 
   /// Parses the given CSV content and returns the rows it contains
   Iterable<List<String>> parse(String buffer) =>
