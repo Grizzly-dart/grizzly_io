@@ -2,14 +2,19 @@ import 'package:grizzly_io/grizzly_io.dart';
 import 'package:test/scaffolding.dart';
 
 void main() {
-  group('JSON', () {
-    test('parse', () async {
-      final data = await JSON().read('data/json/list_of_list/list_of_list.json');
+  group('JSON.read', () {
+    test('list_list', () async {
+      final data = await JSON().read('data/json/list_list.json');
       print(data);
       // TODO
     });
-    test('parse1', () async {
-      final data = await JSON().read('data/json/map1.json');
+    test('map', () async {
+      final data = await JSON().read('data/json/map.json');
+      print(data);
+      // TODO
+    });
+    test('list_map', () async {
+      final data = await JSON().read('data/json/list_map.json');
       print(data);
       // TODO
     });

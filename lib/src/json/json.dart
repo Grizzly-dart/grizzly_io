@@ -8,11 +8,14 @@ class JSON {
     final j = jsonDecode(buffer);
 
     if (j is List) {
-      if (j.every((e) => e is Map)) {
-        // TODO
-        throw UnimplementedError();
-      } else if (j.every((e) => e is List)) {
+      if (j.every((e) => e is List)) {
         return _parseListOfList(j.cast<List>());
+      } else if (j.every((e) => e is Map)) {
+        final data = <String?, List>{};
+        for(final map in j) {
+          _flattenMap(null, map, data);
+        }
+        return data.entries.map((e) => [e.key, ...e.value]);
       } else {
         throw UnsupportedError('unsupported ');
       }
