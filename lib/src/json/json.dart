@@ -12,10 +12,12 @@ class JSON {
         return _parseListOfList(j.cast<List>());
       } else if (j.every((e) => e is Map)) {
         final data = <String?, List>{};
-        for (final map in j) {
-          _flattenMap(null, map, data);
+        _flattenListMap(j.cast<Map<String, dynamic>>(), data);
+        final ret = <List>[data.keys.toList()];
+        for(int i = 0; i < data.values.first.length; i++) {
+          ret.add(data.keys.map((key) => data[key]![i]).toList());
         }
-        return data.entries.map((e) => [e.key, ...e.value]);
+        return ret;
       } else {
         throw UnsupportedError('unsupported ');
       }
@@ -102,7 +104,8 @@ void _flattenListMap(
   for (final item in list) {
     int length = ret.isEmpty ? 0 : ret.values.first.length;
     for (final entry in item.entries) {
-      ret[entry.key] = (ret[entry.key] ?? List.filled(length, null))
+      ret[entry.key] = (ret[entry.key] ??
+          List.filled(length, null, growable: true))
         ..add(entry.value);
     }
     _equalizeMapListLength(ret, length + 1);
