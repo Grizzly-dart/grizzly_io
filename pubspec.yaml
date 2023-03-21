@@ -7,9 +7,9 @@ environment:
   sdk: '>=2.16.0 <3.0.0'
 
 dependencies:
-  intl: ^0.17.0
+  intl: ^0.18.0
   duration: ^3.0.12
-  js_bindings: ^0.0.7
+  js_bindings: ^0.1.2+1
 
 dev_dependencies:
   test:
